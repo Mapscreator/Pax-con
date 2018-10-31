@@ -12,12 +12,6 @@ public enum GameState
     START_SCREEN,
 
     /**
-     * Settings screen
-     */
-
-    SETTINGS,
-
-    /**
      * Main play screen
      */
 

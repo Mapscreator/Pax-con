@@ -10,6 +10,7 @@ import java.awt.event.MouseEvent;
 
 /**
  * Created by Nils Broman.
+ * This class handles all mouse-action buttons in the game.
  */
 public class MouseActionListener extends MouseAdapter{
 
@@ -43,18 +44,13 @@ public class MouseActionListener extends MouseAdapter{
 
     private void addEndScreenActions(final MouseEvent e) {
         if(isBetween(e.getX(), PLAY_AGAIN_X1, PLAY_AGAIN_X2) && isBetween(e.getY(), PLAY_AGAIN_Y1, PLAY_AGAIN_Y2)){
-            board.resetGame();
+            board.resetGameValues();
             board.setState(GameState.PLAY);
         }
     }
 
     private void addStartScreenActions(MouseEvent e){
-        /*
-        if(isBetween(e.getX(), PLAY_X1, PLAY_X2) && isBetween(e.getY(), 720, 820)){ // Settings button
 
-            board.setState(GameState.SETTINGS);
-            comp.boardChanged();
-        } */
         if(isBetween(e.getX(), PLAY_X1, PLAY_X2) && isBetween(e.getY(), PLAY_Y1, PLAY_Y2)){ // Play button
             board.setState(GameState.PLAY);
         }

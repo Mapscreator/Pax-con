@@ -7,12 +7,13 @@ import java.util.List;
 
 /**
  * Created by Nils Broman
+ * This class handles the in list of all the objects in the game. It calls their respective tick function.
  */
 public class ObjHandler {
 
     private final List<GameObject> objects = new LinkedList<>();
     void tick(){
-        for (int i = 0; i < objects.size(); i++) { //Varning på for-loopen, fixar jag varningen får jag error istället.
+        for (int i = 0; i < objects.size(); i++) { //Warning on the for-loop, if I fix the warning I get an error.
             GameObject object = objects.get(i);
             object.tick();
         }

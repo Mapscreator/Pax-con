@@ -21,13 +21,13 @@ public enum ID {
      * Another type of enemy
      */
 
-    DESTROY_ENEMY, //BLUE_ENEMY,
+    DESTROY_ENEMY,
 
     /**
      * Power up that speeds up tha main character
      */
 
-    SPEED_POWER_UP, //SUPER_POWER_UP,
+    SPEED_POWER_UP,
 
     /**
      * Power up that slows down the enemies

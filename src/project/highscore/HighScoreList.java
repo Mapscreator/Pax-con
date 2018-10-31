@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Created by Nils Broman.
  * This class handles the high score list.
  */
 
@@ -23,7 +24,6 @@ public final class HighScoreList
         this.highscoreList = new ArrayList<>();
     }
 
-    private static final HighScoreList INSTANCE = new HighScoreList(); // del?
     private List<HighScore> highscoreList;
 
     public void addScore(HighScore highScores) {
@@ -48,10 +48,6 @@ public final class HighScoreList
 
     public int size(){
         return highscoreList.size();
-    }
-
-    public String getString(int i){
-        return " Name : " + highscoreList.get(i).getName() + " Score : " + highscoreList.get(i).getScore();
     }
 
 }

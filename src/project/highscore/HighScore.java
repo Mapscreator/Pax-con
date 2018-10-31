@@ -1,6 +1,7 @@
 package project.highscore;
 
 /**
+ * Created by Nils Broman.
  * This class handles high scores.
  */
 

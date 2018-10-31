@@ -5,6 +5,7 @@ import project.mechanics.Board;
 
 /**
  * Created by Nils Broman.
+ * This class is for running the entire project. Creates a frame and starts the game.
  */
 public final class GameTest {
 

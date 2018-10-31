@@ -10,6 +10,7 @@ import static project.mechanics.GameState.LEVELS_UNLOCKED;
 
 /**
  * Created by Nils Broman
+ * This class handles all the keyboard input to the game.
  */
 public class KeyActionListener extends KeyAdapter{
     private static final int RIGHT_KEY = 39;
@@ -30,22 +31,24 @@ public class KeyActionListener extends KeyAdapter{
 
         switch(e.getKeyCode()){
             case DOWN_KEY:
-                Board.pacMan.setLastDown();
+                Board.getPacMan().setLastDown();
                 break;
             case UP_KEY:
-                Board.pacMan.setLastUp();
+                Board.getPacMan().setLastUp();
                 break;
             case LEFT_KEY:
-                Board.pacMan.setLastLeft();
+                Board.getPacMan().setLastLeft();
                 break;
             case RIGHT_KEY:
-                Board.pacMan.setLastRight();
+                Board.getPacMan().setLastRight();
                 break;
             case ENTER_KEY:
                 if(board.getState() == GameState.END_SCREEN) {
-                    board.resetGame();
+                    board.resetGameValues();
                 }
-                board.setState(GameState.PLAY);
+                if(board.getState() != GameState.PAUSE_SCREEN){
+		    board.setState(GameState.PLAY);
+		}
                 break;
 	    case SPACE_KEY:
 	        if(board.getState() == LEVELS_UNLOCKED){

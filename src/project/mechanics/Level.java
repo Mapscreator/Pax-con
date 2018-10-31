@@ -10,66 +10,66 @@ public enum Level
      * Level one
      */
 
-    LEVEL1(1,0,0), // 2, 0, 0
+    LEVEL1(2,2),
 
     /**
      * Level two
      */
 
-    LEVEL2(6,0,0),
+    LEVEL2(6,0),
 
     /**
      * Level three
      */
 
-    LEVEL3(6,1,0),
+    LEVEL3(6,1),
 
     /**
      * Level four
      */
 
-    LEVEL4(4,0,0),
+    LEVEL4(4,3),
 
     /**
      * Level five
      */
 
-    LEVEL5(3,3,0),
+    LEVEL5(7,3),
 
     /**
      * Level six
      */
 
-    LEVEL6(1,6,0),
+    LEVEL6(1,6),
 
     /**
      * Level seven
      */
 
-    LEVEL7(8,0,0),
+    LEVEL7(8,0),
 
     /**
      * Level eight
      */
 
-    LEVEL8(3,4,2),
+    LEVEL8(3,4),
 
     /**
      * Level nine
      */
 
-    LEVEL9(5,4,2),
+    LEVEL9(5,4),
 
     /**
      * Level ten
      */
 
-    LEVEL10(10,10,4);
+    LEVEL10(10,10);
 
     private final int basicEnemy;
     private final int largeEnemy;
 
-    Level(int basicEnemy, int largeEnemy, int blueEnemy){
+    Level(int basicEnemy, int largeEnemy){
         this.basicEnemy = basicEnemy;
         this.largeEnemy = largeEnemy;
     }

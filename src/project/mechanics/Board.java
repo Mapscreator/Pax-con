@@ -31,11 +31,7 @@ public class Board {
     private SquareType[][] squares;
     private final static int SQUARE_SIZE = 20;
 
-    /**
-     * Pac man, the main character, needs to be public since??
-     */
-
-    public static PacMan pacMan = null;
+    private static PacMan pacMan = null;
     private final static int PACMAN_START_X = 20, PACMAN_START_Y = 20;
     private List<Point> trail = new ArrayList<>();
     private double percentageComplete = 0;
@@ -46,11 +42,11 @@ public class Board {
 
     private int score = 0;
     private final static int LOSE_SCORE_ON_DEATH = 100, DELETE_ENEMY_SCORE = 200;
-    private HighScore highScore = null;
 
     private int nrPowerUps = 0, nrDestroyEnemies = 0, nrBasicEnemies = 0;
-    private final static double ENEMY_START_VEL_X = -3, ENEMY_START_VEL_Y = 2;
-    private final static int POWER_UPS_RNG_SPAWN = 50; // 400
+    private final static double ENEMY_START_VEL_X = 3, ENEMY_START_VEL_Y = 2;
+    private final static int POWER_UPS_RNG_SPAWN = 200; // 400
+    private static final int MAXIMUM_POWER_UPS = 3;
 
     private int timePassed = 0;
     private final static int PAUSE_DELAY = 3000;
@@ -82,9 +78,9 @@ public class Board {
 	this.notifyListeners();
     }
 
-    public void resetBoard(){
+    private void resetBoard(){
     	clearBoard();
-    	deleteObjects();
+    	deleteAllObjects();
     	updateBoard();
     }
 
@@ -106,7 +102,7 @@ public class Board {
 	}
     }
 
-    private void deleteObjects(){
+    private void deleteAllObjects(){
 	while(!handler.getObjects().isEmpty()){
 	    handler.getObjects().remove(handler.getObjects().get(0));
 	}
@@ -127,75 +123,63 @@ public class Board {
             tick();
         }
     };
-    private final Timer clockTimer = new Timer(25, doOneStep);
+    private final Timer clockTimer = new Timer(30, doOneStep);
+
+    /**
+     * This tick function is the main game-loop. It handles everything affecting the board while playing the game.
+     */
 
     private void tick() {
 
-        if(state == GameState.PLAY){
-            if (this.gameOver) {
-
-		String name = JOptionPane.showInputDialog("Please insert name for highscore : ");
-		if (name == null) {
-		    name = "";
+        switch(state){
+	    case PLAY:
+		if (gameOver) {
+		    enterHighScore();
+		    state = GameState.END_SCREEN;
 		}
-		highScore = new HighScore(name, score);
-
-		HighScoreList highScoreList = HighScoreList.getInstance();
-		highScoreList.addScore(highScore);
-
-		state = GameState.END_SCREEN;
-            }
-            checkTrail();
-            spawnPowerUps();
-            spawnEnemies();
-	    final int percentToCompleteLevel = 80;
-	    if(percentageComplete >= percentToCompleteLevel){
-		Sound.playMusic(COMPLETE_LEVEL_SOUND);
-                state = GameState.PAUSE_SCREEN;
-            }
-            if(pacMan.getLives() == 0){
-                gameOver = true;
-            }
-            handler.tick();
-            this.notifyListeners();
-        }
-        if(state == GameState.PAUSE_SCREEN){
-            this.notifyListeners();
-            pause();
-        }
-        if(state == GameState.SETTINGS){
-            this.notifyListeners();
-	}
-	if(state == GameState.LEVELS_UNLOCKED){
-            this.notifyListeners();
-	}if(state == GameState.END_SCREEN){
-
-	    /*
-	    project.highscore.HighScoreList scoreList = project.highscore.HighScoreList.getInstance();
-
-	    for(int i = 0; i < scoreList.size(); ++i){
-		System.out.println(scoreList.getString(i));
-	    }
-
-		gameOver = false;
-	    state = project.mechanics.GameState.PLAY;
-	    level = level.LEVEL1;
-	    setScore(0);
-	    project.characters.PacMan.setLives(3);
-	    clearBoard();
-	    deleteObjects();
-	    updateBoard();
-	    */
-	    this.notifyListeners();
+		checkTrail();
+		spawnPowerUps();
+		spawnEnemies();
+		final int percentToCompleteLevel = 80;
+		if(percentageComplete >= percentToCompleteLevel){
+		    Sound.playMusic(COMPLETE_LEVEL_SOUND);
+		    timePassed = 0;
+		    state = GameState.PAUSE_SCREEN;
+		}
+		if(pacMan.getLives() <= 0){
+		    gameOver = true;
+		}
+		handler.tick();
+		notifyListeners();
+	        break;
+	    case PAUSE_SCREEN:
+		pauseBetweenLevels();
+		notifyListeners();
+		break;
+	    case LEVELS_UNLOCKED:
+		notifyListeners();
+		break;
+	    case END_SCREEN:
+	        notifyListeners();
+	        break;
+	    case START_SCREEN:
+	        notifyListeners();
+	        break;
+	    default:
+		System.out.println("No game State found");
 	}
     }
 
-    private void pause(){
+    /**
+     * This function makes the game pause in between levels, as well as clears the board and updates the current level.
+     */
+
+    private void pauseBetweenLevels(){
         timePassed += clockTimer.getDelay();
         if(timePassed >= PAUSE_DELAY){
 	    percentageComplete = 0;
             resetBoard();
-            deleteObjects();
+            deleteAllObjects();
 	    level = nextLevel();
             updateBoard();
             pacMan.changeLives(+1);
@@ -203,7 +187,7 @@ public class Board {
         }
     }
 
-    public void resetGame() {
+    public void resetGameValues() {
 
 	resetLevelValues();
 	pacMan.setLives(3);
@@ -226,17 +210,16 @@ public class Board {
 
     private void spawnDifferentPowerUps() {
 	Random rng = new Random();
-	int x = rng.nextInt(width * SQUARE_SIZE) - 2 * SQUARE_SIZE;
-	int y = rng.nextInt(height * SQUARE_SIZE) - 2 * SQUARE_SIZE;
+	int x = rng.nextInt((width * SQUARE_SIZE) - (5 * SQUARE_SIZE)) + (2 * SQUARE_SIZE);
+	int y = rng.nextInt((width * SQUARE_SIZE) - (5 * SQUARE_SIZE)) + (2 * SQUARE_SIZE);
 	int nextPowerUp = rng.nextInt(2);
-	final int maximumPowerUps = 2;
 
-	if(nrPowerUps < maximumPowerUps){
+	if(nrPowerUps < MAXIMUM_POWER_UPS){
 	   if(nextPowerUp == 0){
-	       handler.addObject(new SlowDownEnemies(x, y, ENEMY_START_VEL_X, ENEMY_START_VEL_Y,
+	       handler.addObject(new SlowDownEnemies(x, y,
 						     SQUARE_SIZE * 2, ID.SLOW_DOWN_ENEMIES_POWER_UP, handler));
 	   }else if(nextPowerUp == 1){
-	       handler.addObject(new SpeedUp(x, y, ENEMY_START_VEL_X, ENEMY_START_VEL_Y,
+	       handler.addObject(new SpeedUp(x, y,
 					     SQUARE_SIZE * 2, ID.SPEED_POWER_UP, handler));
 	   }
 	   nrPowerUps++;
@@ -251,8 +234,8 @@ public class Board {
 
     private void spawnBasic(Random rng){
 	while(nrBasicEnemies < level.getBasicEnemy()){
-	    int spawnX = rng.nextInt(width * SQUARE_SIZE - 4 * SQUARE_SIZE) + 2 * SQUARE_SIZE; // removeEnemy magic
-	    int spawnY = rng.nextInt(height * SQUARE_SIZE - 4 * SQUARE_SIZE) + 2 * SQUARE_SIZE; // wtf doesn't work?
+	    int spawnX = rng.nextInt((width * SQUARE_SIZE) - (5 * SQUARE_SIZE)) + (2 * SQUARE_SIZE);
+	    int spawnY = rng.nextInt((height * SQUARE_SIZE) - (5 * SQUARE_SIZE)) + (2 * SQUARE_SIZE);
 
 	    if(getSquareType(spawnX/SQUARE_SIZE, spawnY/SQUARE_SIZE) == SquareType.EMPTY){
 		BasicEnemy b = new BasicEnemy(spawnX, spawnY,
@@ -261,12 +244,12 @@ public class Board {
 		nrBasicEnemies++;
 	    }
         }
-    } // magic
+    }
 
     private void spawnDestroy(Random rng){
         while(nrDestroyEnemies < level.getLargeEnemy()){
-	    int spawnX = rng.nextInt(width * SQUARE_SIZE - 4 * SQUARE_SIZE) + 2 * SQUARE_SIZE; // removeEnemy magic
-	    int spawnY = rng.nextInt(height * SQUARE_SIZE - 4 * SQUARE_SIZE) + 2 * SQUARE_SIZE; // wtf doesn't work?
+	    int spawnX = rng.nextInt((width * SQUARE_SIZE )- (6 * SQUARE_SIZE)) + (2 * SQUARE_SIZE);
+	    int spawnY = rng.nextInt((height * SQUARE_SIZE) - (6 * SQUARE_SIZE)) + (2 * SQUARE_SIZE);
 
 	    if(getSquareType(spawnX/SQUARE_SIZE, spawnY/SQUARE_SIZE) == SquareType.EMPTY){
 		DestroyEnemy d = new DestroyEnemy(spawnX, spawnY,
@@ -276,7 +259,7 @@ public class Board {
 		nrDestroyEnemies++;
 	    }
         }
-    } // magic
+    }
 
     private void spawnPacMan(){
 	pacMan = new PacMan(PACMAN_START_X, PACMAN_START_Y, 0, 0, SQUARE_SIZE, ID.PACMAN, handler);
@@ -345,9 +328,14 @@ public class Board {
 
     /* Trail methods */
 
+    /**
+     * This function adds to the PacMan trail as PacMan walks. The two first trail-squares are "immune" to collision with PacMan
+     * since otherwise the trail couldn't be painted to follow PacMan.
+     * @param x coordinate on where to add the square type.
+     * @param y coordinate on where to add the square type.
+     */
+
     public void addToTrail(int x, int y){
-	// two first squares in the trail is "immune" to collision. You can't die of collision between
-	// SqaureType.LAST_TRAIL and Pacman.
 
         if(trail.size() >= 3){
             int oldX = trail.get(trail.size()-2).x;
@@ -357,6 +345,11 @@ public class Board {
         trail.add(new Point(x, y));
 
     }
+
+    /**
+     * This function locks the PacMan trail in place and make a call to fill one of the spaces divided by the trail.
+     * Also updates percentage complete.
+     */
 
     public void lockTrail(){
 	for (Point aTrail : trail) {
@@ -380,59 +373,82 @@ public class Board {
            }
         }
 
+    /**
+     * This function makes the trail go red once a single square on the trail is marked red. It gets called every single tick
+     * to finally catch up with PacMan leading to losing a life.
+     */
+
     private void checkTrail(){
-            if(!trail.isEmpty()){
+	if(!trail.isEmpty()){
+	    for (int i = 0; i < trail.size() - 1; ++i) {
+		if (getSquareType(trail.get(i).x, trail.get(i).y) == SquareType.RED_TRAIL) {
+		    if(getSquareType(trail.get(i + 1).x, trail.get(i + 1).y) == SquareType.TRAIL ||
+		    getSquareType(trail.get(i + 1).x, trail.get(i + 1).y) == SquareType.LAST_TRAIL){
+			setSquareType(trail.get(i + 1).x, trail.get(i + 1).y, SquareType.RED_TRAIL);
+			break;
+		    }
+		}
+	    }
+	    checkRedTrailCollision();
+	}
+    }
 
-                for (int i = 0; i < trail.size() - 1; ++i) {
-                    if (getSquareType(trail.get(i).x, trail.get(i).y) == SquareType.RED_TRAIL) {
-                        if(getSquareType(trail.get(i + 1).x, trail.get(i + 1).y) == SquareType.TRAIL ||
-    		        getSquareType(trail.get(i + 1).x, trail.get(i + 1).y) == SquareType.LAST_TRAIL){
-                            setSquareType(trail.get(i + 1).x, trail.get(i + 1).y, SquareType.RED_TRAIL);
-                            break;
-                        }
-                    }
-                }
+    /**
+     * This function is checking if the red trail has caught up to PacMan, leading to PacMan losing a life.
+     */
 
-                if(getSquareType(trail.get(trail.size()-1).x, trail.get(trail.size()-1).y) == SquareType.RED_TRAIL){
-                    makeTrailSquaresEmpty();
-                    trail.clear();
-                    loseOneLife();
-                }
-            }
-        }
+    private void checkRedTrailCollision() {
+	if(getSquareType(trail.get(trail.size()-1).x, trail.get(trail.size()-1).y) == SquareType.RED_TRAIL){
+	    makeTrailSquaresEmpty();
+	    trail.clear();
+	    loseOneLife();
+	}
+    }
 
+    /**
+     * This function is checking on PacMans trail and deciding where to search for potential areas to fill. If PacMan is moving
+     * sideways, this function makes a call to compare the segments above and below PacMan. If PacMan is moving vertically,
+     * this function makes a call to compare segments to the left and right of the trail.
+     */
 
     private void fillSpaces(){
 
-            if(!trail.isEmpty()){
-                for (Point aTrail : trail) {
-                    int x = aTrail.x;
-                    int y = aTrail.y;
-                    boolean leftOfTrailEmpty = getSquareType(x - 1, y) == SquareType.EMPTY;
-                    boolean rightOfTrailEmpty = getSquareType(x + 1, y) == SquareType.EMPTY;
-                    boolean belowTrailEmpty = getSquareType(x, y - 1) == SquareType.EMPTY;
-                    boolean aboveTrailEmpty = getSquareType(x, y + 1) == SquareType.EMPTY;
+	if(!trail.isEmpty()){
+	    for (Point aTrail : trail) {
+		int x = aTrail.x;
+		int y = aTrail.y;
+		boolean leftOfTrailEmpty = getSquareType(x - 1, y) == SquareType.EMPTY;
+		boolean rightOfTrailEmpty = getSquareType(x + 1, y) == SquareType.EMPTY;
+		boolean belowTrailEmpty = getSquareType(x, y - 1) == SquareType.EMPTY;
+		boolean aboveTrailEmpty = getSquareType(x, y + 1) == SquareType.EMPTY;
 
-                    if (leftOfTrailEmpty && rightOfTrailEmpty) {
-                        int firstSpace = checkBiggestArea(x - 1, y);
-                        int secondSpace = checkBiggestArea(x + 1, y);
-                        if (firstSpace < secondSpace) {
-                            floodFill(x - 1, y);
-                        } else if (firstSpace > secondSpace) {
-                            floodFill(x + 1, y);
-                        }
-                    } else if (belowTrailEmpty && aboveTrailEmpty) {
-                        int firstSpace = checkBiggestArea(x, y - 1);
-                        int secondSpace = checkBiggestArea(x, y + 1);
-                        if (firstSpace < secondSpace) {
-                            floodFill(x, y - 1);
-                        } else if (firstSpace > secondSpace) {
-                            floodFill(x, y + 1);
-                        }
-                    }
-                }
-            }
-        }
+		if (leftOfTrailEmpty && rightOfTrailEmpty) {
+		    int firstSpace = checkBiggestArea(x - 1, y);
+		    int secondSpace = checkBiggestArea(x + 1, y);
+		    if (firstSpace < secondSpace) {
+			floodFill(x - 1, y);
+		    } else if (firstSpace > secondSpace) {
+			floodFill(x + 1, y);
+		    }
+		} else if (belowTrailEmpty && aboveTrailEmpty) {
+		    int firstSpace = checkBiggestArea(x, y - 1);
+		    int secondSpace = checkBiggestArea(x, y + 1);
+		    if (firstSpace < secondSpace) {
+			floodFill(x, y - 1);
+		    } else if (firstSpace > secondSpace) {
+			floodFill(x, y + 1);
+		    }
+		}
+	    }
+	}
+    }
+
+    /**
+     * This function is implemented according to the algorithm flood fill. It starts in a point and basically fills connected
+     * points with, in this case, the square type done.
+     * @param x start coordinate
+     * @param y start coordinate
+     */
 
     private void floodFill(int x, int y){
         if(getSquareType(x, y) == SquareType.DONE){
@@ -470,6 +486,14 @@ public class Board {
             }
         }
     }
+
+    /**
+     * This function calulates the number of connected empty squares from a given start point. It does this by using the
+     * floodFill algoritm as mentioned above but instead of changing the square types if just counts the number of empty squares
+     * @param x start coordinate, from which to count connected 'nodes'
+     * @param y start coordinate, from which to count connected 'nodes'
+     * @return int, how big the connected area was.
+     */
 
     private int checkBiggestArea(int x, int y){
         int i = 0;
@@ -528,6 +552,11 @@ public class Board {
         }
     }
 
+    /**
+     * This function calculates and updates how much percentage of the playing field that is covered with done squares or blue
+     * squares.
+     */
+
     void setPercentage(){
         int totalBlocks = 0;
         double blocksDone = 0;
@@ -541,7 +570,6 @@ public class Board {
         }
         percentageComplete = 100 * blocksDone / totalBlocks;
     }
-
 
     public void loseOneLife(){
     	Sound.playMusic(LOSE_ONE_LIFE_SOUND);
@@ -563,6 +591,22 @@ public class Board {
 	}
     }
 
+    private void enterHighScore() {
+
+    	String name = JOptionPane.showInputDialog("Please insert name for highscore : ");
+    	if (name == null) {
+    	    name = "";
+    	}
+	final HighScore highScore = new HighScore(name, score);
+
+    	HighScoreList highScoreList = HighScoreList.getInstance();
+    	highScoreList.addScore(highScore);
+
+    }
+
+    public void changeNrOfPowerUps(final int i) {
+        nrPowerUps += i;
+    }
 
     /* Getters and setters */
 
@@ -575,7 +619,7 @@ public class Board {
             return this.squares[x][y];
         }
 
-    public static ObjHandler getHandler() {
+    public ObjHandler getHandler() {
     	return handler;
         }
 
@@ -597,11 +641,7 @@ public class Board {
         return level;
     }
 
-    public void setLevel(Level level){
-        this.level = level;
-    }
-
-    public PacMan getPacMan() { return pacMan; }
+    public static PacMan getPacMan() { return pacMan; }
 
     public int getScore() {
         return score;
@@ -611,7 +651,7 @@ public class Board {
         return percentageComplete;
     }
 
-    public static int getSquareSize() {
+    public int getSquareSize() {
 	return SQUARE_SIZE;
     }
 
@@ -623,31 +663,8 @@ public class Board {
 	this.nrPowerUps = nrPowerUps;
     }
 
-    public static double getEnemyStartVelX() {
-	return ENEMY_START_VEL_X;
-    }
-
-    public static double getEnemyStartVelY() {
-	return ENEMY_START_VEL_Y;
-    }
-
-    private HighScore getHighScore() {
-	return highScore;
-    }
-
-    public static List<LevelsUnlocked> getLevelsUnlocked() { // del?
+    public List<LevelsUnlocked> getLevelsUnlocked() { // del?
 	return levelsUnlocked;
     }
 
-    public void setLevelsUnlocked(final List<LevelsUnlocked> levelsUnlocked) {
-	Board.levelsUnlocked = levelsUnlocked;
-    }
-
-    public void setScore(final int score) {
-	this.score = score;
-    }
-
-    public void changeNrOfPowerUps(final int i) {
-        nrPowerUps += i;
-    }
 }

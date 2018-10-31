@@ -44,7 +44,7 @@ public enum SquareType {
 
     /**
      * SquareType Last-trail. Is so that the player can't collide with the last two squares that
-     * was marked "trail".
+     * was marked "trail". Makes the trail follow PacMan better than if all of the trail could collide with PacMan.
      */
 
     LAST_TRAIL

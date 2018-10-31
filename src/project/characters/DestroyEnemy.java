@@ -5,11 +5,10 @@ import project.mechanics.Board;
 import project.mechanics.DefaultCollisionHandler;
 import project.mechanics.ID;
 import project.mechanics.ObjHandler;
-import project.mechanics.SquareType;
 
 /**
- * Created by Nils Broman
- * This class is used to handle the specific project.characters.GameObject project.characters.DestroyEnemy
+ * Created by Nils Broman.
+ * This class is used to handle the specific GameObject DestroyEnemy
  */
 public class DestroyEnemy extends GameObject
 {
@@ -20,42 +19,42 @@ public class DestroyEnemy extends GameObject
     public void tick() {
         setX((int) (getX() + getVelX()));
         setY((int) (getY() + getVelY()));
-        bounce();
+        bounceOnCollision();
+
+        int squareSize = GameTest.getBoard().getSquareSize();
+
+	setX(clamp(getX(), squareSize, squareSize*GameTest.getBoard().getWidth() - GameTest.getBoard().getSquareSize()*2));
+	setY(clamp(getY(), squareSize, squareSize*GameTest.getBoard().getHeight() - GameTest.getBoard().getSquareSize()*2));
+
     }
 
-    private void bounce(){
+    private void bounceOnCollision(){
 
         DefaultCollisionHandler h = new DefaultCollisionHandler();
 
-        switch(h.defaultCollisionHandler(this)){
+        switch(h.hasCollision(this)){
             case 0:
-                //right hit
-		setVelX(getVelX() *(-1));
+                //right or left hit
+		velX *= (-1);
                 break;
             case 1:
-                //left hit
-		setVelX(getVelX() * (-1));
+                //down or up hit
+		velY *= (-1);
                 break;
-            case 2:
-                //down hit
-		setVelY(getVelY() * (-1));
-                break;
-            case 3:
-                //up hit
-		setVelY(getVelY() * (-1));
-                break;
-            default:
+	    case 2:
+	        // collision with corner
+	        velX *= (-1);
+	        velY *= (-1);
+		break;
+	    default:
                 // no collision
-        }
-
-        if(h.steppingOnSquareType(this) == SquareType.TRAIL){
-            GameTest.getBoard().setSquareType(getX() / Board.getSquareSize(), getY() / Board.getSquareSize(), SquareType.RED_TRAIL);
         }
     }
 
     public void handleCollision() {
-	GameTest.getBoard().getPacMan().resetPacMan();
+	Board.getPacMan().resetPacMan();
 	GameTest.getBoard().makeTrailSquaresEmpty();
 	GameTest.getBoard().deleteTrail();
+	GameTest.getBoard().loseOneLife();
     }
 }

@@ -19,7 +19,6 @@ public class GameFrame extends JFrame{
 
         this.setLayout(new BorderLayout());
         this.add(gameComponent, BorderLayout.CENTER);
-        //this.setKeyBindings();
         this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
     }

@@ -7,17 +7,18 @@ import java.awt.*;
 
 /**
  * Created by Nils Broman.
+ * This class handles all the shared functions and variables for any game object.
  */
 public abstract class GameObject
 {
 
-    private int x;
-    private int y;
+    int x;
+    int y;
     private int size;
     private ObjHandler handler;
     private final ID id;
-    private double velX;
-    private double velY;
+    double velX;
+    double velY;
 
     protected GameObject(int x, int y, double velX, double velY, int size, ID id, ObjHandler handler){
         this.x = x;
@@ -29,6 +30,30 @@ public abstract class GameObject
         this.handler = handler;
     }
 
+    /**
+     * Constructor for the power up class with no velocity
+     * @param x x coordinate
+     * @param y y coordinate
+     * @param size size of the powerup
+     * @param id id represnt what kind of power up it is
+     * @param handler handler is the handler for all the game objects
+     */
+
+    protected GameObject(final int x, final int y, final int size, final ID id, final ObjHandler handler) {
+        this.x = x;
+        this.y = y;
+        this.size = size;
+        this.id = id;
+        this.handler = handler;
+    }
+
+    static int clamp(int compareValue, int min, int max){
+	if(compareValue >= max){return max;}
+	else if(compareValue <= min){return min;}
+	return compareValue;
+    }
+
+
     public int getX() {
         return x;
     }
@@ -39,7 +64,7 @@ public abstract class GameObject
         return size;
     }
 
-    Rectangle getBounds(){
+    public Rectangle getBounds(){
         return new Rectangle(x, y, size, size);
     }
 

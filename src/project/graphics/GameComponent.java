@@ -87,8 +87,10 @@ public class GameComponent extends JComponent implements BoardListener
     public Dimension getPreferredSize() {
         super.getPreferredSize();
         // Size is based on number of blocks.
-        return new Dimension(this.board.getWidth() * Board.getSquareSize() - BOARD_OFFSET * Board.getSquareSize(),
-			     this.board.getHeight() * Board.getSquareSize() - BOARD_OFFSET * Board.getSquareSize());
+        return new Dimension(this.board.getWidth() * GameTest.getBoard().getSquareSize()
+			     - BOARD_OFFSET * GameTest.getBoard().getSquareSize(),
+			     this.board.getHeight() * GameTest.getBoard().getSquareSize()
+			     - BOARD_OFFSET * GameTest.getBoard().getSquareSize());
     }
 
     @Override
@@ -107,22 +109,32 @@ public class GameComponent extends JComponent implements BoardListener
             case PAUSE_SCREEN:
                 drawSquares(g2d);
                 drawGameElements(g2d);
-                drawText(g2d);
+                drawLevelComplete(g2d);
                 break;
             case START_SCREEN:
                 drawStartScreen(g2d);
                 break;
             case LEVELS_UNLOCKED:
-                drawLevels(g2d);
+                drawLevelsScreen(g2d);
                 break;
             default:
                 System.out.printf("No game-state found");
         }
     }
 
-    private void drawLevels(final Graphics2D draw) {
+    private void drawStartScreen(Graphics2D g){
+	ImageIcon img;
+	img = new ImageIcon(START_SCREEN_IMG);
+	Image startScreen = img.getImage();
+	g.drawImage(startScreen, 0, 0,
+		board.getWidth()* GameTest.getBoard().getSquareSize(),
+		board.getHeight()* GameTest.getBoard().getSquareSize(),
+		null);
+    }
 
-        List<LevelsUnlocked> levelList = Board.getLevelsUnlocked();
+    private void drawLevelsScreen(final Graphics2D draw) {
+
+        List<LevelsUnlocked> levelList = GameTest.getBoard().getLevelsUnlocked();
 
         draw.setColor(Color.black);
 	draw.fillRect(0, 0, getWidth(), getHeight());
@@ -145,8 +157,8 @@ public class GameComponent extends JComponent implements BoardListener
 		}else{
 		    if(levelList.get(index) == LevelsUnlocked.UNLOCKED){
 			addText(draw, String.valueOf(index + 1),
-				LEVEL_TEXT_X + i * SPACE_BTWN_LEVEL_IMG_X - Board.getSquareSize(),
-				LEVEL_TEXT_Y + j*SPACE_BETWEEN_LEVEL_IMG_Y - Board.getSquareSize(), NORMAL_FONT_SIZE, YELLOW);
+				LEVEL_TEXT_X + i * SPACE_BTWN_LEVEL_IMG_X - GameTest.getBoard().getSquareSize(),
+				LEVEL_TEXT_Y + j*SPACE_BETWEEN_LEVEL_IMG_Y - GameTest.getBoard().getSquareSize(), NORMAL_FONT_SIZE, YELLOW);
 		    }else{
 		        drawElement(LEVEL_LOCK_IMG, draw,
 				    LEVEL_IMG_X + i * SPACE_BTWN_LEVEL_IMG_X,
@@ -158,36 +170,16 @@ public class GameComponent extends JComponent implements BoardListener
 	}
     }
 
-    private void drawEndScreen(final Graphics2D draw) {
+    private void drawLevelComplete(final Graphics2D draw) {
 
-	HighScoreList highScoreList = HighScoreList.getInstance();
-
-	draw.setColor(Color.black);
-	draw.fillRect(0, 0, getWidth(), getHeight());
-	addText(draw, "HighScore : ",HIGHSCORE_X, HIGHSCORE_Y, NORMAL_FONT_SIZE, YELLOW);
-
-	String[] highScores = highScoreList.toString().split("\n");
-
-	for (int i = 0; i < highScores.length; i++) {
-	    addText(draw, highScores[i], HIGHSCORE_X, HIGHSCORE_LIST_Y + i * SPACE_BTWN_HIGHSCORES, NORMAL_FONT_SIZE, YELLOW);
-	}
-
-	draw.setColor(YELLOW);
-	draw.fillRect(PLAY_AGAIN_X, PLAY_AGAIN_Y, PLAY_AGAIN_WIDTH, PLAY_AGAIN_HEIGHT);
-	addText(draw, "Play again?", PLAY_AGAIN_TEXT_X, PLAY_AGAIN_TEXT_Y, NORMAL_FONT_SIZE, BLUE);
+        int x = board.getWidth()* GameTest.getBoard().getSquareSize() / 3;
+        int y = board.getHeight() * GameTest.getBoard().getSquareSize() / 2;
+        addText(draw, "LEVEL COMPLETE", x, y, HUGE_FONT_SIZE, YELLOW);
 
     }
 
-    private void drawText(final Graphics2D draw) {
-
-        int x = board.getWidth()* Board.getSquareSize() / 3;
-        int y = board.getHeight() * Board.getSquareSize() / 2;
-        addText(draw, "LEVEL COMPLETE", x, y, HUGE_FONT_SIZE, YELLOW);
-
-    } // magic?!??!
-
     private void drawGameElements(Graphics2D draw){
-        ObjHandler handler = Board.getHandler();
+        ObjHandler handler = GameTest.getBoard().getHandler();
         for(int i = 0; i < handler.getObjects().size(); i++) {
             GameObject object = handler.getObjects().get(i);
             switch (object.getId()) {
@@ -214,16 +206,36 @@ public class GameComponent extends JComponent implements BoardListener
         addText(draw, new DecimalFormat("##.#").format(board.getPercentageComplete())
 		      + "/100% Complete", PERCENT_X, PERCENT_Y, SMALL_FONT_SIZE, YELLOW);
         addText(draw, String.valueOf(board.getLevel()), LEVEL_X, LEVEL_Y, SMALL_FONT_SIZE, YELLOW);
-        addText(draw, "Lives left: " + GameTest.getBoard().getPacMan().getLives(), LIVES_LEFT_X, LIVES_LEFT_Y, SMALL_FONT_SIZE, YELLOW);
+        addText(draw, "Lives left: " + Board.getPacMan().getLives(), LIVES_LEFT_X, LIVES_LEFT_Y, SMALL_FONT_SIZE, YELLOW);
     }
 
     private void drawElement(String fileName, Graphics draw, int x, int y, int size){
 	ImageIcon img = new ImageIcon(fileName);
 	Image imgSlow = img.getImage();
 	draw.drawImage(imgSlow,
-		       x - Board.getSquareSize(),
-		       y - Board.getSquareSize(),
+		       x - GameTest.getBoard().getSquareSize(),
+		       y - GameTest.getBoard().getSquareSize(),
 		       size, size, null);
+    }
+
+    private void drawEndScreen(final Graphics2D draw) {
+
+	HighScoreList highScoreList = HighScoreList.getInstance();
+
+	draw.setColor(Color.black);
+	draw.fillRect(0, 0, getWidth(), getHeight());
+	addText(draw, "HighScore : ",HIGHSCORE_X, HIGHSCORE_Y, NORMAL_FONT_SIZE, YELLOW);
+
+	String[] highScores = highScoreList.toString().split("\n");
+
+	for (int i = 0; i < highScores.length; i++) {
+	    addText(draw, highScores[i], HIGHSCORE_X, HIGHSCORE_LIST_Y + i * SPACE_BTWN_HIGHSCORES, NORMAL_FONT_SIZE, YELLOW);
+	}
+
+	draw.setColor(YELLOW);
+	draw.fillRect(PLAY_AGAIN_X, PLAY_AGAIN_Y, PLAY_AGAIN_WIDTH, PLAY_AGAIN_HEIGHT);
+	addText(draw, "Play again?", PLAY_AGAIN_TEXT_X, PLAY_AGAIN_TEXT_Y, NORMAL_FONT_SIZE, BLUE);
+
     }
 
     private void addText(Graphics2D g, String text, int x, int y, int size, Color color){
@@ -233,19 +245,9 @@ public class GameComponent extends JComponent implements BoardListener
         g.drawString(text, x, y);
     }
 
-    private void drawStartScreen(Graphics2D g){
-        ImageIcon img;
-        img = new ImageIcon(START_SCREEN_IMG);
-        Image startScreen = img.getImage();
-        g.drawImage(startScreen, 0, 0,
-		    board.getWidth()* Board.getSquareSize(),
-		    board.getHeight()* Board.getSquareSize(),
-		    null);
-    }
-
     private void drawSquares(Graphics2D g2d){
         g2d.setColor(Color.BLACK);
-        g2d.fillRect(Board.getSquareSize(), Board.getSquareSize(), this.getWidth(), this.getHeight());
+        g2d.fillRect(GameTest.getBoard().getSquareSize(), GameTest.getBoard().getSquareSize(), this.getWidth(), this.getHeight());
 
         for (int i = 1; i < this.board.getWidth(); i++) {
             // Starts on 1 because of not wanting to draw the squares outside the board
@@ -271,8 +273,8 @@ public class GameComponent extends JComponent implements BoardListener
 	ImageIcon icon = new ImageIcon(fileName);
 	Image img = icon.getImage();
 	g2d.drawImage(img,
-		      (x - 1) * Board.getSquareSize(),
-		      (y - 1) * Board.getSquareSize(),
-		      Board.getSquareSize(),Board.getSquareSize(), null);
+		      (x - 1) * GameTest.getBoard().getSquareSize(),
+		      (y - 1) * GameTest.getBoard().getSquareSize(),
+		      GameTest.getBoard().getSquareSize(),GameTest.getBoard().getSquareSize(), null);
     }
 }
