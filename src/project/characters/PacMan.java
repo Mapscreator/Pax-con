@@ -14,11 +14,11 @@ import project.mechanics.SquareType;
 public class PacMan extends GameObject
 {
     private final static int START_SPEED = 5;
-    private int speed = START_SPEED;
+    private int speed;
     private boolean lastRight = false, lastLeft = false, lastUp = false, lastDown = false;
 
     private final static int START_LIVES = 3;
-    private int lives = START_LIVES;
+    private int lives;
 
     private final static String RIGHT_IMG = "C:\\Users\\Admin\\IdeaProjects\\Pax-con\\img\\right.png",
 				LEFT_IMG = "C:\\Users\\Admin\\IdeaProjects\\Pax-con\\img\\left.png",
@@ -26,9 +26,10 @@ public class PacMan extends GameObject
 				DOWN_IMG = "C:\\Users\\Admin\\IdeaProjects\\Pax-con\\img\\down.png";
     private static String img = RIGHT_IMG;
 
-
     public PacMan(int x, int y, double velX, double velY, int size, ID id, ObjHandler handler) {
         super(x, y, velX, velY, size, id, handler);
+	speed = START_SPEED;
+	lives = START_LIVES;
     }
 
     public void handleCollision() {

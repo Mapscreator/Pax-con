@@ -45,7 +45,7 @@ public class Board {
 
     private int nrPowerUps = 0, nrDestroyEnemies = 0, nrBasicEnemies = 0;
     private final static double ENEMY_START_VEL_X = 3, ENEMY_START_VEL_Y = 2;
-    private final static int POWER_UPS_RNG_SPAWN = 200; // 400
+    private final static int POWER_UPS_RNG_SPAWN = 200;
     private static final int MAXIMUM_POWER_UPS = 3;
 
     private int timePassed = 0;
