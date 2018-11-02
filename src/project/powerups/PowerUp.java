@@ -1,33 +1,29 @@
 package project.powerups;
 
-import project.GameTest;
+import project.Game;
 import project.characters.GameObject;
-import project.mechanics.ID;
-import project.mechanics.ObjHandler;
+import project.collisiondetection.PowerUpCollisionHandler;
+import project.mechanics.Type;
+import project.mechanics.GameObjectHandler;
 
 /**
  * Created by Nils Broman
  * This class that handles all the shared variables and functions of the power up classes.
  */
-abstract class PowerUp extends GameObject
+public abstract class PowerUp extends GameObject
 {
 
-    PowerUp(int x, int y, int size, ID id, ObjHandler handler) {
-        super(x, y, size, id, handler);
+    PowerUp(int x, int y, int size, Type type, GameObjectHandler handler) {
+        super(x, y, size, type, handler, new PowerUpCollisionHandler());
     }
 
 
-    void collisionWithEnemy(){
-        for(int i = 0; i < getHandler().getObjects().size(); ++i){
-            GameObject tempObj = getHandler().getObjects().get(i);
-            if(tempObj.getId() == ID.BASIC_ENEMY || tempObj.getId() == ID.DESTROY_ENEMY){
-                if(getBounds().intersects(tempObj.getBounds())){
-                    getHandler().removeObject(this);
-                    GameTest.getBoard().changeNrOfPowerUps(-1);
-                }
-            }
-        }
+    public void reactToEnemyCollision(){
+	getHandler().removeObject(this);
+	Game.getBoard().changeNrOfPowerUps(-1);
     }
+
+    public abstract void reactToPacManCollision();
 
 
 }

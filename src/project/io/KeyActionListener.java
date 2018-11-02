@@ -1,5 +1,6 @@
-package project;
+package project.io;
 
+import project.Game;
 import project.mechanics.Board;
 import project.mechanics.GameState;
 
@@ -21,7 +22,7 @@ public class KeyActionListener extends KeyAdapter{
     private static final int DOWN_KEY = 40;
     private static final int UP_KEY = 38;
 
-    private Board board = GameTest.getBoard();
+    private Board board = Game.getBoard();
 
     @Override
     public void keyPressed(KeyEvent e) {
@@ -31,16 +32,16 @@ public class KeyActionListener extends KeyAdapter{
 
         switch(e.getKeyCode()){
             case DOWN_KEY:
-                Board.getPacMan().setLastDown();
+                board.getPacMan().setLastDown();
                 break;
             case UP_KEY:
-                Board.getPacMan().setLastUp();
+                board.getPacMan().setLastUp();
                 break;
             case LEFT_KEY:
-                Board.getPacMan().setLastLeft();
+                board.getPacMan().setLastLeft();
                 break;
             case RIGHT_KEY:
-                Board.getPacMan().setLastRight();
+                board.getPacMan().setLastRight();
                 break;
             case ENTER_KEY:
                 if(board.getState() == GameState.END_SCREEN) {

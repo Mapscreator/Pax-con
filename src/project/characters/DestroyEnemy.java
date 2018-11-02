@@ -1,60 +1,31 @@
 package project.characters;
 
-import project.GameTest;
+import project.Game;
 import project.mechanics.Board;
-import project.mechanics.DefaultCollisionHandler;
-import project.mechanics.ID;
-import project.mechanics.ObjHandler;
+import project.mechanics.Type;
+import project.mechanics.GameObjectHandler;
+import project.mechanics.SquareType;
 
 /**
  * Created by Nils Broman.
  * This class is used to handle the specific GameObject DestroyEnemy
  */
-public class DestroyEnemy extends GameObject
+public class DestroyEnemy extends Enemy
 {
-
-    public DestroyEnemy(int x, int y, double velX, double velY, int size, ID id, ObjHandler handler){super(x, y, velX, velY, size, id, handler);}
-
-    @Override
-    public void tick() {
-        setX((int) (getX() + getVelX()));
-        setY((int) (getY() + getVelY()));
-        bounceOnCollision();
-
-        int squareSize = GameTest.getBoard().getSquareSize();
-
-	setX(clamp(getX(), squareSize, squareSize*GameTest.getBoard().getWidth() - GameTest.getBoard().getSquareSize()*2));
-	setY(clamp(getY(), squareSize, squareSize*GameTest.getBoard().getHeight() - GameTest.getBoard().getSquareSize()*2));
-
+    public DestroyEnemy(int x, int y, int velX, int velY, int size, Type type, GameObjectHandler handler){
+        super(x, y, velX, velY, size, type, handler);
     }
 
-    private void bounceOnCollision(){
-
-        DefaultCollisionHandler h = new DefaultCollisionHandler();
-
-        switch(h.hasCollision(this)){
-            case 0:
-                //right or left hit
-		velX *= (-1);
-                break;
-            case 1:
-                //down or up hit
-		velY *= (-1);
-                break;
-	    case 2:
-	        // collision with corner
-	        velX *= (-1);
-	        velY *= (-1);
-		break;
-	    default:
-                // no collision
-        }
-    }
-
-    public void handleCollision() {
-	Board.getPacMan().resetPacMan();
-	GameTest.getBoard().makeTrailSquaresEmpty();
-	GameTest.getBoard().deleteTrail();
-	GameTest.getBoard().loseOneLife();
+    /**
+     * This method deletes the block that the Destroy Enemy just collided with.
+     * @param x coordinate of block that is to be destroyed
+     * @param y coordinate fo block that is to be destroyed
+     */
+    @Override public void reactToWallCollision(final int x, final int y) {
+	Board board = Game.getBoard();
+        if(board.getSquareType(x, y) == SquareType.DONE){
+	    board.setSquareType(x, y, SquareType.EMPTY);
+	    board.setPercentage();
+	}
     }
 }

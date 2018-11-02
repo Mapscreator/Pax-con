@@ -1,4 +1,4 @@
-package project;
+package project.io;
 
 import sun.audio.AudioPlayer;
 import sun.audio.AudioStream;
@@ -24,14 +24,16 @@ public final class Sound {
         try{
 
 	    InputStream music = new FileInputStream(new File(filepath));
-	    AudioStream audios = new AudioStream(music);
+	    AudioStream audios = new AudioStream(music); // Warning, us of Sun-supplied class 'AudioStream' is not portable.
             AudioPlayer.player.start(audios);
 
         } catch (FileNotFoundException e) {
 	    JOptionPane.showMessageDialog(null, "File not found");
 	    logger.log(Level.SEVERE, "Exception " + e, e);
 	    e.printStackTrace();
-	} catch(Exception e){
+	} catch(Exception e){ // Warning catch of Exception is too broad.
+	    // This warning show up despite of having caught the FileNotFoundException above, if i "fix" the warning another
+	    // exactly similar catch appears.
             JOptionPane.showMessageDialog(null, "Failed to play music in game");
             logger.log(Level.SEVERE, "Exception " +e, e);
         }

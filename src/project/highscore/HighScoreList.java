@@ -14,10 +14,10 @@ public final class HighScoreList
 
     private static final int NR_OF_ENTRIES = 20;
 
-    private static HighScoreList ourInstance = new HighScoreList();
+    private static HighScoreList instance = new HighScoreList();
 
     public static HighScoreList getInstance() {
-	return ourInstance;
+	return instance;
     }
 
     private HighScoreList() {
@@ -44,10 +44,6 @@ public final class HighScoreList
     }
 
     return stringBuilder.toString();
-    }
-
-    public int size(){
-        return highscoreList.size();
     }
 
 }

@@ -1,9 +1,9 @@
 package project.characters;
 
-import project.GameTest;
-import project.mechanics.DefaultCollisionHandler;
-import project.mechanics.ID;
-import project.mechanics.ObjHandler;
+import project.Game;
+import project.mechanics.Type;
+import project.mechanics.GameObjectHandler;
+import project.collisiondetection.PacManCollisionHandler;
 import project.mechanics.SquareType;
 
 /**
@@ -24,32 +24,20 @@ public class PacMan extends GameObject
 				LEFT_IMG = "C:\\Users\\Admin\\IdeaProjects\\Pax-con\\img\\left.png",
 				UP_IMG = "C:\\Users\\Admin\\IdeaProjects\\Pax-con\\img\\up.png",
 				DOWN_IMG = "C:\\Users\\Admin\\IdeaProjects\\Pax-con\\img\\down.png";
-    private static String img = RIGHT_IMG;
+    private String img = RIGHT_IMG;
 
-    public PacMan(int x, int y, double velX, double velY, int size, ID id, ObjHandler handler) {
-        super(x, y, velX, velY, size, id, handler);
+    public PacMan(int x, int y, int size, Type type, GameObjectHandler handler) {
+        super(x, y, size, type, handler, new PacManCollisionHandler());
 	speed = START_SPEED;
 	lives = START_LIVES;
     }
 
-    public void handleCollision() {
-	for(int i = 0; i < getHandler().getObjects().size(); ++i){
-	    GameObject tempObj = getHandler().getObjects().get(i);
-	    if(getBounds().intersects(tempObj.getBounds())) {
-		if (tempObj.getId() != ID.PACMAN) {
-		    tempObj.handleCollision();
-		}
-	    }
-	}
-    }
-
     public void resetPacMan(){
-	setX(GameTest.getBoard().getSquareSize());
-	setY(GameTest.getBoard().getSquareSize());
-	setVelX(0);
-	setVelY(0);
+	setX(Game.getBoard().getSquareSize());
+	setY(Game.getBoard().getSquareSize());
     }
 
+    @Override
     public void tick(){
 
         if(lastRight){
@@ -70,48 +58,51 @@ public class PacMan extends GameObject
 	    setX(correctMove(getX()));
         }
 
-
-        setX(clamp(getX(), GameTest.getBoard().getSquareSize(), GameTest.getBoard().getSquareSize()*GameTest.getBoard().getWidth() - GameTest.getBoard().getSquareSize()*2));
-        setY(clamp(getY(), GameTest.getBoard().getSquareSize(), GameTest.getBoard().getSquareSize()*GameTest.getBoard().getHeight() - GameTest.getBoard().getSquareSize()*2));
-
-        handleCollision();
-        collisionWithBoard();
+        setX(clamp(getX(), Game.getBoard().getSquareSize(), Game.getBoard().getSquareSize() * Game.getBoard().getWidth() - Game.getBoard().getSquareSize() * 2));
+        setY(clamp(getY(), Game.getBoard().getSquareSize(), Game.getBoard().getSquareSize() * Game.getBoard().getHeight() - Game.getBoard().getSquareSize() * 2));
     }
 
-    private void collisionWithBoard(){
-        DefaultCollisionHandler h = new DefaultCollisionHandler();
+    /**
+     * This method calls necessary functions for when PacMan steps on a empty square, eg adding a trail-square.
+     * @param x coordinate of empty square
+     * @param y coordinate of empty square
+     */
+    public void steppingOnEmptySquare(final int x, final int y) {
+  	Game.getBoard().addToTrail(x, y);
+  	Game.getBoard().setSquareType(x, y, SquareType.LAST_TRAIL);
+    }
 
-        if(h.steppingOnSquareType(this) == SquareType.EMPTY){
-            GameTest.getBoard().addToTrail(getX()/GameTest.getBoard().getSquareSize(), getY()/GameTest.getBoard().getSquareSize());
-            GameTest.getBoard().setSquareType(getX()/GameTest.getBoard().getSquareSize(), getY()/GameTest.getBoard().getSquareSize(), SquareType.LAST_TRAIL);
-        }
-        else if(h.steppingOnSquareType(this) == SquareType.HARD_FRAME || h.steppingOnSquareType(this) == SquareType.DONE){
-            GameTest.getBoard().lockTrail();
-        }
-        else if(h.steppingOnSquareType(this) == SquareType.TRAIL || h.steppingOnSquareType(this) == SquareType.RED_TRAIL){
-            resetPacMan();
-            GameTest.getBoard().loseOneLife();
-            GameTest.getBoard().makeTrailSquaresEmpty();
-            GameTest.getBoard().deleteTrail();
-        }
+    /**
+     * This method calls a function to lock the trail when PacMan enters a "safe" square.
+     */
+    public void steppingOnHardFrame() {
+	Game.getBoard().lockTrail();
+    }
 
+    /**
+     * This method calls necessary functions for when PacMan steps on it's own trail.
+     */
+    public void steppingOnTrail(){
+	resetPacMan();
+	Game.getBoard().loseOneLife();
+	Game.getBoard().makeTrailSquaresEmpty();
+	Game.getBoard().deleteTrail();
     }
 
     /**
      * Corrects the move of pacman, making him walk exactly according to the grid and not between squares.
-     * @param axis is the x or y axis that is to be corrected
-     * @return int to Pacman, corrected according to the grid.
+     * @param coordinate is the x or y coordinate that is to be corrected
+     * @return new coordinate to Pacman, corrected according to the grid
      */
-
-    private int correctMove(int axis) {
-	if(axis % getSize() != 0){
-	    if(axis % getSize() > getSize() / 2){
-		axis = axis - (axis % getSize()) + getSize();
+    private int correctMove(int coordinate) {
+	if(coordinate % getSize() != 0){
+	    if(coordinate % getSize() > getSize() / 2){
+		coordinate = coordinate - (coordinate % getSize()) + getSize();
 	    }else{
-		axis -= (axis % getSize());
+		coordinate -= (coordinate % getSize());
 	    }
 	}
-        return axis;
+        return coordinate;
     }
 
     private void moveRight(){
@@ -128,10 +119,9 @@ public class PacMan extends GameObject
     }
 
     /**
-     * These four functions below are to set booleans of the last pressed key. Depending on which is last pressed, the
+     * These four methods below are to set booleans of the last pressed key. Depending on which is last pressed, the
      * PacMan character moves in different directions.
      */
-
     public void setLastRight(){
         lastRight = true;
         lastDown = false;
@@ -157,18 +147,12 @@ public class PacMan extends GameObject
         lastUp = true;
     }
 
-
-
     public int getLives() {
         return lives;
     }
 
-    /**
-     * Warning that lives value os always 3. I don't want to change it because the value is supposed to be replaceable
-     * @param lives PacMans lives left
-     */
-
-    public void setLives(final int lives) {
+    public void setLives(final int lives) {	// Warning that lives value is always 3. I don't want to change it because
+						// the value is supposed to be replaceable
 	this.lives = lives;
     }
 
@@ -180,7 +164,7 @@ public class PacMan extends GameObject
         speed += change;
     }
 
-    public static String getImg() {
+    public String getImg() {
 	return img;
     }
 
@@ -191,4 +175,5 @@ public class PacMan extends GameObject
     public int getStartSpeed() {
 	return START_SPEED;
     }
+
 }

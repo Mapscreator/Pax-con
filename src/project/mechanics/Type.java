@@ -3,7 +3,8 @@ package project.mechanics;
 /**
  * Created by Nils Broman
  */
-public enum ID {
+public enum Type
+{
 
     /**
      * Player id

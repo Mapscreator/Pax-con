@@ -1,65 +1,49 @@
 package project.characters;
 
-import project.GameTest;
+import project.Game;
 import project.mechanics.Board;
-import project.mechanics.DefaultCollisionHandler;
-import project.mechanics.ID;
-import project.mechanics.ObjHandler;
+import project.mechanics.Type;
+import project.mechanics.GameObjectHandler;
+import project.mechanics.SquareType;
 
 /**
  * Created by Nils Broman.
  * This class is used to handle the specific GameObject BasicEnemy.
  */
-public class BasicEnemy extends GameObject
+public class BasicEnemy extends Enemy
 {
+    private Board board = Game.getBoard();
 
-    private DefaultCollisionHandler h = new DefaultCollisionHandler();
-
-    public BasicEnemy(int x, int y, double velX, double velY, int size, ID enemy, ObjHandler handler){
+    public BasicEnemy(int x, int y, int velX, int velY, int size, Type enemy, GameObjectHandler handler){
         super(x, y, velX, velY, size, enemy, handler);
     }
 
-    @Override
-    public void tick() {
+    /**
+     * This method deletes the Basic Enemy of it's surrounded by blocks that are not empty.
+     * @param x not used
+     * @param y not used
+     */
+    @Override public void reactToWallCollision(final int x, final int y) {
 
-        y += velY;
-	x += velX;
 
-        bounceOnCollision();
+	int xEnemy = this.x / Game.getBoard().getSquareSize();
+	int yEnemy = this.y / Game.getBoard().getSquareSize();
 
-        int squareSize = GameTest.getBoard().getSquareSize();
-
-	setX(clamp(getX(), squareSize, squareSize*GameTest.getBoard().getWidth() - GameTest.getBoard().getSquareSize()*2));
-	setY(clamp(getY(), squareSize, squareSize*GameTest.getBoard().getHeight() - GameTest.getBoard().getSquareSize()*2));
+	if(isSurrounded(xEnemy, yEnemy)) {
+		board.removeEnemy(this);
+	}
     }
 
-    private void bounceOnCollision(){
-
-        switch(h.hasCollision(this)){
-            case 0:
-                // left or right hit
-                velX *= (-1);
-		return;
-            case 1:
-                //up or down hit
-		velY *= (-1);
-		return;
-	    case 2:
-	        // Corner hit
-		velX *= (-1);
-	        velY *= (-1);
-		break;
-	    default:
-                break;
-                //no collision;
-        }
-
+    private boolean isSurrounded(int xEnemy, int yEnemy){
+	return xEnemy == 0 && board.getSquareType(xEnemy, yEnemy + 1) != SquareType.EMPTY &&
+		   board.getSquareType(xEnemy, yEnemy - 1) != SquareType.EMPTY ||
+		   yEnemy == 0 && board.getSquareType(xEnemy + 1, yEnemy) != SquareType.EMPTY &&
+		   board.getSquareType(xEnemy - 1, yEnemy) != SquareType.EMPTY ||
+		   board.getSquareType(xEnemy + 1, yEnemy) != SquareType.EMPTY &&
+		   board.getSquareType(xEnemy - 1, yEnemy) != SquareType.EMPTY &&
+		   board.getSquareType(xEnemy, yEnemy + 1) != SquareType.EMPTY &&
+		   board.getSquareType(xEnemy, yEnemy - 1) != SquareType.EMPTY;
     }
 
-    public void handleCollision() {
-	Board.getPacMan().resetPacMan();
-	GameTest.getBoard().makeTrailSquaresEmpty();
-	GameTest.getBoard().deleteTrail();
-	GameTest.getBoard().loseOneLife();
-    }
+
 }

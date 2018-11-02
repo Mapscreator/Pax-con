@@ -1,5 +1,6 @@
-package project;
+package project.io;
 
+import project.Game;
 import project.graphics.GameComponent;
 import project.graphics.GameFrame;
 import project.mechanics.Board;
@@ -14,7 +15,7 @@ import java.awt.event.MouseEvent;
  */
 public class MouseActionListener extends MouseAdapter{
 
-    private Board board = GameTest.getBoard();
+    private Board board = Game.getBoard();
     private static GameComponent comp = GameFrame.getGameComponent();
 
     /**

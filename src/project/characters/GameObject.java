@@ -1,9 +1,9 @@
 package project.characters;
 
-import project.mechanics.ID;
-import project.mechanics.ObjHandler;
-
 import java.awt.*;
+import project.collisiondetection.CollisionHandler;
+import project.mechanics.Type;
+import project.mechanics.GameObjectHandler;
 
 /**
  * Created by Nils Broman.
@@ -11,46 +11,44 @@ import java.awt.*;
  */
 public abstract class GameObject
 {
-
-    int x;
-    int y;
+    int x; // Warning package visible, if I put these variables as private then all the sub-classes cannot access the variables
+           // as easily
+    int y; // Warning package visible
     private int size;
-    private ObjHandler handler;
-    private final ID id;
-    double velX;
-    double velY;
-
-    protected GameObject(int x, int y, double velX, double velY, int size, ID id, ObjHandler handler){
-        this.x = x;
-        this.y = y;
-        this.velX = velX;
-        this.velY = velY;
-        this.size = size;
-        this.id = id;
-        this.handler = handler;
-    }
+    private GameObjectHandler handler;
+    private CollisionHandler collisionHandler;
+    private final Type type;
 
     /**
-     * Constructor for the power up class with no velocity
+     * Constructor
      * @param x x coordinate
      * @param y y coordinate
-     * @param size size of the powerup
-     * @param id id represnt what kind of power up it is
-     * @param handler handler is the handler for all the game objects
+     * @param size size of object in pixels
+     * @param type type of object
+     * @param handler handler the game object
      */
-
-    protected GameObject(final int x, final int y, final int size, final ID id, final ObjHandler handler) {
+    protected GameObject(final int x, final int y, final int size, final Type type, final GameObjectHandler handler, CollisionHandler collisionHandler) {
         this.x = x;
         this.y = y;
         this.size = size;
-        this.id = id;
+        this.type = type;
         this.handler = handler;
+        this.collisionHandler = collisionHandler;
     }
 
-    static int clamp(int compareValue, int min, int max){
-	if(compareValue >= max){return max;}
-	else if(compareValue <= min){return min;}
-	return compareValue;
+    public abstract void tick();
+
+    /**
+     * Regulates position of the game object so that it never goes outside the board.
+     * @param coordinate x or y coordinate of game object
+     * @param min min value allowed for coordinate
+     * @param max max value allowed for coordinate
+     * @return allowed coordinate
+     */
+    static int clamp(int coordinate, int min, int max){
+	if(coordinate >= max){ return max; }
+	else if(coordinate <= min){ return min; }
+	return coordinate;
     }
 
 
@@ -64,43 +62,31 @@ public abstract class GameObject
         return size;
     }
 
+
+    /**
+     * This method is used to detect collision between rectangles. To be adle to call intersects() on two rectangles.
+     * @return rectangle
+     */
     public Rectangle getBounds(){
         return new Rectangle(x, y, size, size);
     }
 
-    public abstract void handleCollision();
-
-    public ID getId(){
-        return id;
+    public Type getType(){
+        return type;
     }
 
-    public abstract void tick();
-
-    public double getVelX() {
-        return velX;
-    }
-
-    public void setVelX(final double velX) {
-        this.velX = velX;
-    }
-
-    public double getVelY() {
-        return velY;
-    }
-
-    public void setVelY(final double velY) {
-        this.velY = velY;
-    }
-
-    public ObjHandler getHandler() {
+    public GameObjectHandler getHandler() {
 	return handler;
     }
 
     public void setX(final int x) {
 	this.x = x;
     }
-
     public void setY(final int y) {
         this.y = y;
+    }
+
+    public CollisionHandler getCollisionHandler() {
+	return collisionHandler;
     }
 }

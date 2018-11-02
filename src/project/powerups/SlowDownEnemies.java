@@ -1,10 +1,11 @@
 package project.powerups;
 
-import project.GameTest;
-import project.Sound;
+import project.Game;
+import project.io.Sound;
+import project.characters.Enemy;
 import project.characters.GameObject;
-import project.mechanics.ID;
-import project.mechanics.ObjHandler;
+import project.mechanics.Type;
+import project.mechanics.GameObjectHandler;
 
 import java.util.List;
 
@@ -17,16 +18,17 @@ public class SlowDownEnemies extends PowerUp
 {
     private final static int SPEED_DIVIDER = 1, DURATION = 1000;
 
-    private static int timePassed = 0;
-    private static boolean runTimer = false;
+    private int timePassed = 0;
+    private boolean runTimer = false;
     private final static String SOUND_PATH = "C:\\Users\\Admin\\IdeaProjects\\Pax-con\\Sounds\\oh-yeah-everything-is-fine.wav";
 
-    public SlowDownEnemies(final int x, final int y, final int size, final ID id,
-			   final ObjHandler handler)
+    public SlowDownEnemies(final int x, final int y, final int size, final Type type,
+			   final GameObjectHandler handler)
     {
-	super(x, y, size, id, handler);
+	super(x, y, size, type, handler);
     }
 
+    @Override
     public void tick(){
 
 	if(runTimer){
@@ -37,52 +39,48 @@ public class SlowDownEnemies extends PowerUp
 	    }
 	    timePassed++;
 	}
-	collisionWithEnemy();
     }
 
     private void resetSpeeds() {
 
 	List<GameObject> objectList = getHandler().getObjects();
 	for (int i = 0; i < objectList.size(); ++i) {
-	    if (objectList.get(i).getId() == ID.BASIC_ENEMY || objectList.get(i).getId() == ID.DESTROY_ENEMY) {
-
-		changeSpeeds(i, -SPEED_DIVIDER, -SPEED_DIVIDER);
+	    if (objectList.get(i).getType() == Type.BASIC_ENEMY || objectList.get(i).getType() == Type.DESTROY_ENEMY) {
+		changeSpeeds((Enemy) objectList.get(i), -SPEED_DIVIDER, -SPEED_DIVIDER);
 	    }
 	}
 
     }
 
-    @Override
-    public void handleCollision()
+
+    public void reactToPacManCollision()
     {
 	List<GameObject> objectList = getHandler().getObjects();
 	for (int i = 0; i < objectList.size(); ++i) {
-	    if (objectList.get(i).getId() == ID.BASIC_ENEMY || objectList.get(i).getId() == ID.DESTROY_ENEMY) {
-
-	        changeSpeeds(i, SPEED_DIVIDER, SPEED_DIVIDER);
+	    if (objectList.get(i).getType() == Type.BASIC_ENEMY || objectList.get(i).getType() == Type.DESTROY_ENEMY) {
+	        changeSpeeds((Enemy) objectList.get(i), SPEED_DIVIDER, SPEED_DIVIDER);
 
 		this.getHandler().removeObject(this);
 	    }
 	}
 	startTimer();
 	Sound.playMusic(SOUND_PATH);
-	GameTest.getBoard().setNrPowerUps(GameTest.getBoard().getNrPowerUps() - 1);
+	Game.getBoard().setNrPowerUps(Game.getBoard().getNrPowerUps() - 1);
     }
 
-    private void changeSpeeds(int i, double changeX, double changeY) {
+    private void changeSpeeds(Enemy enemy, int changeX, int changeY) {
 
-	List<GameObject> objectList = getHandler().getObjects();
-	double velX = objectList.get(i).getVelX();
-	double velY = objectList.get(i).getVelY();
-	if(objectList.get(i).getVelX() > 0){
-	    objectList.get(i).setVelX(velX - changeX);
+	int velX = enemy.getVelX();
+	int velY = enemy.getVelY();
+	if(enemy.getVelX() > 0){
+	    enemy.setVelX(velX - changeX);
 	}else{
-	    objectList.get(i).setVelX(velX + changeX);
+	    enemy.setVelX(velX + changeX);
 	}
-	if(objectList.get(i).getVelY() > 0){
-	    objectList.get(i).setVelY(velY - changeY);
+	if(enemy.getVelY() > 0){
+	    enemy.setVelY(velY - changeY);
 	}else{
-	    objectList.get(i).setVelY(velY + changeY);
+	    enemy.setVelY(velY + changeY);
 	}
 
     }

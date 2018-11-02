@@ -10,7 +10,7 @@ public enum Level
      * Level one
      */
 
-    LEVEL1(2,2),
+    LEVEL1(1,0),
 
     /**
      * Level two

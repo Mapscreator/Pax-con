@@ -1,19 +1,19 @@
 package project.graphics;
 
-import project.GameTest;
+import project.characters.GameObject;
+import project.characters.PacMan;
+import project.Game;
+import project.highscore.HighScoreList;
 import project.mechanics.Board;
 import project.mechanics.BoardListener;
-import project.characters.GameObject;
-import project.highscore.HighScoreList;
+import project.mechanics.GameObjectHandler;
 import project.mechanics.LevelsUnlocked;
-import project.mechanics.ObjHandler;
-import project.characters.PacMan;
 import project.mechanics.SquareType;
 
-import javax.swing.*;
 import java.awt.*;
 import java.text.DecimalFormat;
 import java.util.List;
+import javax.swing.*;
 
 import static java.awt.Color.BLUE;
 import static java.awt.Color.YELLOW;
@@ -36,45 +36,40 @@ public class GameComponent extends JComponent implements BoardListener
     /**
      * Variables used to draw the Level-select screen.
      */
-
-    private final static int LEVEL_IMG_X = 140, LEVEL_IMG_Y = 300, LEVEL_IMG_SIZE = 60, SPACE_BTWN_LEVEL_IMG_X = 120,
-	    SPACE_BETWEEN_LEVEL_IMG_Y = 100, LEVEL_TEXT_X = 160, LEVEL_TEXT_Y = 350;
+    private final static int LEVEL_IMG_X = 140, LEVEL_IMG_Y = 300, LEVEL_IMG_SIZE = 60,
+	    		     SPACE_BETWEEN_LEVEL_IMG_X = 120, SPACE_BETWEEN_LEVEL_IMG_Y = 100,
+	    		     LEVEL_TEXT_X = 160, LEVEL_TEXT_Y = 350;
     private final static String LEVEL_LOCK_IMG = "C:\\Users\\Admin\\IdeaProjects\\Pax-con\\img\\LevelLock.png";
     private final static String LEVEL_BACKGROUND_IMG = "C:\\Users\\Admin\\IdeaProjects\\Pax-con\\img\\LevelBackgound.png";
 
     /**
      * Variables used to draw the end game screen, including high score list.
      */
-
-    private final static int HIGHSCORE_X = 100, HIGHSCORE_Y = 100, HIGHSCORE_LIST_Y = 140, SPACE_BTWN_HIGHSCORES = 25,
-	    PLAY_AGAIN_X = 200, PLAY_AGAIN_Y = 600, PLAY_AGAIN_WIDTH = 400, PLAY_AGAIN_HEIGHT = 100, PLAY_AGAIN_TEXT_X = 250,
-	    PLAY_AGAIN_TEXT_Y = 650;
+    private final static int HIGH_SCORE_X = 100, HIGH_SCORE_Y = 100, HIGH_SCORE_LIST_Y = 140, SPACE_BETWEEN_HIGH_SCORES = 25,
+	    		     PLAY_AGAIN_X = 200, PLAY_AGAIN_Y = 600, PLAY_AGAIN_WIDTH = 400, PLAY_AGAIN_HEIGHT = 100,
+	    		     PLAY_AGAIN_TEXT_X = 250, PLAY_AGAIN_TEXT_Y = 650;
 
     /**
      * All the images used for the GameObject sprites.
      */
-
     private final static String BASIC_ENEMY_IMG = "C:\\Users\\Admin\\IdeaProjects\\Pax-con\\img\\BASICENEMY.png",
-	    DESTROY_ENEMY_IMG = "C:\\Users\\Admin\\IdeaProjects\\Pax-con\\img\\LARGEENEMY.png",
-	    SPEED_POWER_UP_IMG = "C:\\Users\\Admin\\IdeaProjects\\Pax-con\\img\\speedPowerUp.png",
-	    SLOW_DOWN_POWER_UP = "C:\\Users\\Admin\\IdeaProjects\\Pax-con\\img\\SlowDownPowerUp.png";
+			        DESTROY_ENEMY_IMG = "C:\\Users\\Admin\\IdeaProjects\\Pax-con\\img\\LARGEENEMY.png",
+			        SPEED_POWER_UP_IMG = "C:\\Users\\Admin\\IdeaProjects\\Pax-con\\img\\speedPowerUp.png",
+			        SLOW_DOWN_POWER_UP = "C:\\Users\\Admin\\IdeaProjects\\Pax-con\\img\\SlowDownPowerUp.png";
 
     /**
      * All the images used to draw the different squares on the board.
      */
-
     private final static String BLUE_SQUARE = "C:\\Users\\Admin\\IdeaProjects\\Pax-con\\img\\PAXCONTILE.png",
-	    EMPTY_SQUARE = "C:\\Users\\Admin\\IdeaProjects\\Pax-con\\img\\PAXCONTILEE.png",
-	    TRAIL_SQUARE = "C:\\Users\\Admin\\IdeaProjects\\Pax-con\\img\\TRAIL.png",
-	    RED_TRAIL_SQUARE = "C:\\Users\\Admin\\IdeaProjects\\Pax-con\\img\\REDTRAIL.png";
+			        EMPTY_SQUARE = "C:\\Users\\Admin\\IdeaProjects\\Pax-con\\img\\PAXCONTILEE.png",
+			        TRAIL_SQUARE = "C:\\Users\\Admin\\IdeaProjects\\Pax-con\\img\\TRAIL.png",
+			        RED_TRAIL_SQUARE = "C:\\Users\\Admin\\IdeaProjects\\Pax-con\\img\\REDTRAIL.png";
 
     /**
      * Variables for the main game state. Includes score, percent complete, level and lives left coordinates.
      */
-
     private final static int SCORE_X = 100, SCORE_Y = 150, PERCENT_X = 250, PERCENT_Y = 150, LEVEL_X = 550, LEVEL_Y = 150,
-	    LIVES_LEFT_X = 100, LIVES_LEFT_Y = 200;
-
+	    		     LIVES_LEFT_X = 100, LIVES_LEFT_Y = 200;
 
     GameComponent(Board board) {
         this.board = board;
@@ -87,10 +82,10 @@ public class GameComponent extends JComponent implements BoardListener
     public Dimension getPreferredSize() {
         super.getPreferredSize();
         // Size is based on number of blocks.
-        return new Dimension(this.board.getWidth() * GameTest.getBoard().getSquareSize()
-			     - BOARD_OFFSET * GameTest.getBoard().getSquareSize(),
-			     this.board.getHeight() * GameTest.getBoard().getSquareSize()
-			     - BOARD_OFFSET * GameTest.getBoard().getSquareSize());
+        return new Dimension(this.board.getWidth() * Game.getBoard().getSquareSize()
+			     - BOARD_OFFSET * Game.getBoard().getSquareSize(),
+			     this.board.getHeight() * Game.getBoard().getSquareSize()
+			     - BOARD_OFFSET * Game.getBoard().getSquareSize());
     }
 
     @Override
@@ -123,18 +118,17 @@ public class GameComponent extends JComponent implements BoardListener
     }
 
     private void drawStartScreen(Graphics2D g){
-	ImageIcon img;
-	img = new ImageIcon(START_SCREEN_IMG);
+	ImageIcon img = new ImageIcon(START_SCREEN_IMG);
 	Image startScreen = img.getImage();
 	g.drawImage(startScreen, 0, 0,
-		board.getWidth()* GameTest.getBoard().getSquareSize(),
-		board.getHeight()* GameTest.getBoard().getSquareSize(),
-		null);
+		    board.getWidth() * Game.getBoard().getSquareSize(),
+		    board.getHeight() * Game.getBoard().getSquareSize(),
+		    null);
     }
 
     private void drawLevelsScreen(final Graphics2D draw) {
 
-        List<LevelsUnlocked> levelList = GameTest.getBoard().getLevelsUnlocked();
+        List<LevelsUnlocked> levelList = Game.getBoard().getLevelsUnlocked();
 
         draw.setColor(Color.black);
 	draw.fillRect(0, 0, getWidth(), getHeight());
@@ -147,21 +141,21 @@ public class GameComponent extends JComponent implements BoardListener
 	    for(int i = 0; i < columns; ++i){
 
 		drawElement(LEVEL_BACKGROUND_IMG, draw,
-			    LEVEL_IMG_X + i * SPACE_BTWN_LEVEL_IMG_X,
+			    LEVEL_IMG_X + i * SPACE_BETWEEN_LEVEL_IMG_X,
 			    LEVEL_IMG_Y + j*SPACE_BETWEEN_LEVEL_IMG_Y, LEVEL_IMG_SIZE);
 
 		if(levelList.size() == index){
 		    drawElement(LEVEL_LOCK_IMG, draw,
-				LEVEL_IMG_X + i * SPACE_BTWN_LEVEL_IMG_X,
+				LEVEL_IMG_X + i * SPACE_BETWEEN_LEVEL_IMG_X,
 				LEVEL_IMG_Y + j*SPACE_BETWEEN_LEVEL_IMG_Y, LEVEL_IMG_SIZE);
 		}else{
 		    if(levelList.get(index) == LevelsUnlocked.UNLOCKED){
 			addText(draw, String.valueOf(index + 1),
-				LEVEL_TEXT_X + i * SPACE_BTWN_LEVEL_IMG_X - GameTest.getBoard().getSquareSize(),
-				LEVEL_TEXT_Y + j*SPACE_BETWEEN_LEVEL_IMG_Y - GameTest.getBoard().getSquareSize(), NORMAL_FONT_SIZE, YELLOW);
+				LEVEL_TEXT_X + i * SPACE_BETWEEN_LEVEL_IMG_X - Game.getBoard().getSquareSize(),
+				LEVEL_TEXT_Y + j*SPACE_BETWEEN_LEVEL_IMG_Y - Game.getBoard().getSquareSize(), NORMAL_FONT_SIZE, YELLOW);
 		    }else{
 		        drawElement(LEVEL_LOCK_IMG, draw,
-				    LEVEL_IMG_X + i * SPACE_BTWN_LEVEL_IMG_X,
+				    LEVEL_IMG_X + i * SPACE_BETWEEN_LEVEL_IMG_X,
 				    LEVEL_IMG_Y + j*SPACE_BETWEEN_LEVEL_IMG_Y, LEVEL_IMG_SIZE);
 		    }
 		    index++;
@@ -171,20 +165,19 @@ public class GameComponent extends JComponent implements BoardListener
     }
 
     private void drawLevelComplete(final Graphics2D draw) {
-
-        int x = board.getWidth()* GameTest.getBoard().getSquareSize() / 3;
-        int y = board.getHeight() * GameTest.getBoard().getSquareSize() / 2;
+        int x = board.getWidth() * Game.getBoard().getSquareSize() / 3;
+        int y = board.getHeight() * Game.getBoard().getSquareSize() / 2;
         addText(draw, "LEVEL COMPLETE", x, y, HUGE_FONT_SIZE, YELLOW);
 
     }
 
     private void drawGameElements(Graphics2D draw){
-        ObjHandler handler = GameTest.getBoard().getHandler();
+        GameObjectHandler handler = Game.getBoard().getGameObjectHandler();
         for(int i = 0; i < handler.getObjects().size(); i++) {
             GameObject object = handler.getObjects().get(i);
-            switch (object.getId()) {
+            switch (object.getType()) {
                 case PACMAN:
-		    drawElement(PacMan.getImg(), draw, object.getX(), object.getY(), object.getSize());
+		    drawElement(((PacMan) object).getImg(), draw, object.getX(), object.getY(), object.getSize());
                     break;
                 case BASIC_ENEMY:
 		    drawElement(BASIC_ENEMY_IMG, draw, object.getX(), object.getY(), object.getSize());
@@ -206,15 +199,15 @@ public class GameComponent extends JComponent implements BoardListener
         addText(draw, new DecimalFormat("##.#").format(board.getPercentageComplete())
 		      + "/100% Complete", PERCENT_X, PERCENT_Y, SMALL_FONT_SIZE, YELLOW);
         addText(draw, String.valueOf(board.getLevel()), LEVEL_X, LEVEL_Y, SMALL_FONT_SIZE, YELLOW);
-        addText(draw, "Lives left: " + Board.getPacMan().getLives(), LIVES_LEFT_X, LIVES_LEFT_Y, SMALL_FONT_SIZE, YELLOW);
+        addText(draw, "Lives left: " + board.getPacMan().getLives(), LIVES_LEFT_X, LIVES_LEFT_Y, SMALL_FONT_SIZE, YELLOW);
     }
 
     private void drawElement(String fileName, Graphics draw, int x, int y, int size){
 	ImageIcon img = new ImageIcon(fileName);
 	Image imgSlow = img.getImage();
 	draw.drawImage(imgSlow,
-		       x - GameTest.getBoard().getSquareSize(),
-		       y - GameTest.getBoard().getSquareSize(),
+		       x - Game.getBoard().getSquareSize(),
+		       y - Game.getBoard().getSquareSize(),
 		       size, size, null);
     }
 
@@ -224,12 +217,12 @@ public class GameComponent extends JComponent implements BoardListener
 
 	draw.setColor(Color.black);
 	draw.fillRect(0, 0, getWidth(), getHeight());
-	addText(draw, "HighScore : ",HIGHSCORE_X, HIGHSCORE_Y, NORMAL_FONT_SIZE, YELLOW);
+	addText(draw, "HighScore : ", HIGH_SCORE_X, HIGH_SCORE_Y, NORMAL_FONT_SIZE, YELLOW);
 
 	String[] highScores = highScoreList.toString().split("\n");
 
 	for (int i = 0; i < highScores.length; i++) {
-	    addText(draw, highScores[i], HIGHSCORE_X, HIGHSCORE_LIST_Y + i * SPACE_BTWN_HIGHSCORES, NORMAL_FONT_SIZE, YELLOW);
+	    addText(draw, highScores[i], HIGH_SCORE_X, HIGH_SCORE_LIST_Y + i * SPACE_BETWEEN_HIGH_SCORES, NORMAL_FONT_SIZE, YELLOW);
 	}
 
 	draw.setColor(YELLOW);
@@ -247,7 +240,7 @@ public class GameComponent extends JComponent implements BoardListener
 
     private void drawSquares(Graphics2D g2d){
         g2d.setColor(Color.BLACK);
-        g2d.fillRect(GameTest.getBoard().getSquareSize(), GameTest.getBoard().getSquareSize(), this.getWidth(), this.getHeight());
+        g2d.fillRect(Game.getBoard().getSquareSize(), Game.getBoard().getSquareSize(), this.getWidth(), this.getHeight());
 
         for (int i = 1; i < this.board.getWidth(); i++) {
             // Starts on 1 because of not wanting to draw the squares outside the board
@@ -273,8 +266,8 @@ public class GameComponent extends JComponent implements BoardListener
 	ImageIcon icon = new ImageIcon(fileName);
 	Image img = icon.getImage();
 	g2d.drawImage(img,
-		      (x - 1) * GameTest.getBoard().getSquareSize(),
-		      (y - 1) * GameTest.getBoard().getSquareSize(),
-		      GameTest.getBoard().getSquareSize(),GameTest.getBoard().getSquareSize(), null);
+		      (x - 1) * Game.getBoard().getSquareSize(),
+		      (y - 1) * Game.getBoard().getSquareSize(),
+		      Game.getBoard().getSquareSize(), Game.getBoard().getSquareSize(), null);
     }
 }

@@ -2,7 +2,7 @@ package project.mechanics;
 
 import project.highscore.HighScore;
 import project.highscore.HighScoreList;
-import project.Sound;
+import project.io.Sound;
 import project.characters.BasicEnemy;
 import project.characters.DestroyEnemy;
 import project.characters.GameObject;
@@ -25,13 +25,13 @@ public class Board {
 
     private GameState state = GameState.START_SCREEN;
     private List<BoardListener> boardListeners;
-    private static ObjHandler handler = new ObjHandler();
+    private static GameObjectHandler gameObjectHandler = new GameObjectHandler();
 
     private int width, height;
     private SquareType[][] squares;
     private final static int SQUARE_SIZE = 20;
 
-    private static PacMan pacMan = null;
+    private PacMan pacMan = null;
     private final static int PACMAN_START_X = 20, PACMAN_START_Y = 20;
     private List<Point> trail = new ArrayList<>();
     private double percentageComplete = 0;
@@ -44,7 +44,7 @@ public class Board {
     private final static int LOSE_SCORE_ON_DEATH = 100, DELETE_ENEMY_SCORE = 200;
 
     private int nrPowerUps = 0, nrDestroyEnemies = 0, nrBasicEnemies = 0;
-    private final static double ENEMY_START_VEL_X = 3, ENEMY_START_VEL_Y = 2;
+    private final static int ENEMY_START_VEL_X = 3, ENEMY_START_VEL_Y = 2;
     private final static int POWER_UPS_RNG_SPAWN = 200;
     private static final int MAXIMUM_POWER_UPS = 3;
 
@@ -103,8 +103,8 @@ public class Board {
     }
 
     private void deleteAllObjects(){
-	while(!handler.getObjects().isEmpty()){
-	    handler.getObjects().remove(handler.getObjects().get(0));
+	while(!gameObjectHandler.getObjects().isEmpty()){
+	    gameObjectHandler.getObjects().remove(gameObjectHandler.getObjects().get(0));
 	}
     }
 
@@ -126,7 +126,7 @@ public class Board {
     private final Timer clockTimer = new Timer(30, doOneStep);
 
     /**
-     * This tick function is the main game-loop. It handles everything affecting the board while playing the game.
+     * This tick method is the main game-loop. It handles everything affecting the board while playing the game.
      */
 
     private void tick() {
@@ -149,7 +149,7 @@ public class Board {
 		if(pacMan.getLives() <= 0){
 		    gameOver = true;
 		}
-		handler.tick();
+		gameObjectHandler.tick();
 		notifyListeners();
 	        break;
 	    case PAUSE_SCREEN:
@@ -171,7 +171,7 @@ public class Board {
     }
 
     /**
-     * This function makes the game pause in between levels, as well as clears the board and updates the current level.
+     * This method makes the game pause in between levels, as well as clears the board and updates the current level.
      */
 
     private void pauseBetweenLevels(){
@@ -216,11 +216,11 @@ public class Board {
 
 	if(nrPowerUps < MAXIMUM_POWER_UPS){
 	   if(nextPowerUp == 0){
-	       handler.addObject(new SlowDownEnemies(x, y,
-						     SQUARE_SIZE * 2, ID.SLOW_DOWN_ENEMIES_POWER_UP, handler));
+	       gameObjectHandler.addObject(new SlowDownEnemies(x, y,
+						     SQUARE_SIZE * 2, Type.SLOW_DOWN_ENEMIES_POWER_UP, gameObjectHandler));
 	   }else if(nextPowerUp == 1){
-	       handler.addObject(new SpeedUp(x, y,
-					     SQUARE_SIZE * 2, ID.SPEED_POWER_UP, handler));
+	       gameObjectHandler.addObject(new SpeedUp(x, y,
+					     SQUARE_SIZE * 2, Type.SPEED_POWER_UP, gameObjectHandler));
 	   }
 	   nrPowerUps++;
 	}
@@ -239,8 +239,9 @@ public class Board {
 
 	    if(getSquareType(spawnX/SQUARE_SIZE, spawnY/SQUARE_SIZE) == SquareType.EMPTY){
 		BasicEnemy b = new BasicEnemy(spawnX, spawnY,
-					   ENEMY_START_VEL_X, ENEMY_START_VEL_Y, SQUARE_SIZE, ID.BASIC_ENEMY, handler);
-		handler.addObject(b);
+					      ENEMY_START_VEL_X, ENEMY_START_VEL_Y, SQUARE_SIZE, Type.BASIC_ENEMY,
+					      gameObjectHandler);
+		gameObjectHandler.addObject(b);
 		nrBasicEnemies++;
 	    }
         }
@@ -254,16 +255,16 @@ public class Board {
 	    if(getSquareType(spawnX/SQUARE_SIZE, spawnY/SQUARE_SIZE) == SquareType.EMPTY){
 		DestroyEnemy d = new DestroyEnemy(spawnX, spawnY,
 						  ENEMY_START_VEL_X, ENEMY_START_VEL_Y,
-						  SQUARE_SIZE * 2, ID.DESTROY_ENEMY, handler);
-		handler.addObject(d);
+						  SQUARE_SIZE * 2, Type.DESTROY_ENEMY, gameObjectHandler);
+		gameObjectHandler.addObject(d);
 		nrDestroyEnemies++;
 	    }
         }
     }
 
     private void spawnPacMan(){
-	pacMan = new PacMan(PACMAN_START_X, PACMAN_START_Y, 0, 0, SQUARE_SIZE, ID.PACMAN, handler);
-        handler.addObject(pacMan);
+	pacMan = new PacMan(PACMAN_START_X, PACMAN_START_Y, SQUARE_SIZE, Type.PACMAN, gameObjectHandler);
+        gameObjectHandler.addObject(pacMan);
     }
 
     /* Level methods */
@@ -329,7 +330,7 @@ public class Board {
     /* Trail methods */
 
     /**
-     * This function adds to the PacMan trail as PacMan walks. The two first trail-squares are "immune" to collision with PacMan
+     * This method adds to the PacMan trail as PacMan walks. The two first trail-squares are "immune" to collision with PacMan
      * since otherwise the trail couldn't be painted to follow PacMan.
      * @param x coordinate on where to add the square type.
      * @param y coordinate on where to add the square type.
@@ -347,7 +348,7 @@ public class Board {
     }
 
     /**
-     * This function locks the PacMan trail in place and make a call to fill one of the spaces divided by the trail.
+     * This method locks the PacMan trail in place and make a call to fill one of the spaces divided by the trail.
      * Also updates percentage complete.
      */
 
@@ -374,7 +375,7 @@ public class Board {
         }
 
     /**
-     * This function makes the trail go red once a single square on the trail is marked red. It gets called every single tick
+     * This method makes the trail go red once a single square on the trail is marked red. It gets called every single tick
      * to finally catch up with PacMan leading to losing a life.
      */
 
@@ -394,7 +395,7 @@ public class Board {
     }
 
     /**
-     * This function is checking if the red trail has caught up to PacMan, leading to PacMan losing a life.
+     * This method is checking if the red trail has caught up to PacMan, leading to PacMan losing a life.
      */
 
     private void checkRedTrailCollision() {
@@ -406,9 +407,9 @@ public class Board {
     }
 
     /**
-     * This function is checking on PacMans trail and deciding where to search for potential areas to fill. If PacMan is moving
-     * sideways, this function makes a call to compare the segments above and below PacMan. If PacMan is moving vertically,
-     * this function makes a call to compare segments to the left and right of the trail.
+     * This method is checking on PacMans trail and deciding where to search for potential areas to fill. If PacMan is moving
+     * sideways, this method makes a call to compare the segments above and below PacMan. If PacMan is moving vertically,
+     * this method makes a call to compare segments to the left and right of the trail.
      */
 
     private void fillSpaces(){
@@ -444,7 +445,7 @@ public class Board {
     }
 
     /**
-     * This function is implemented according to the algorithm flood fill. It starts in a point and basically fills connected
+     * This method is implemented according to the algorithm flood fill. It starts in a point and basically fills connected
      * points with, in this case, the square type done.
      * @param x start coordinate
      * @param y start coordinate
@@ -488,7 +489,7 @@ public class Board {
     }
 
     /**
-     * This function calulates the number of connected empty squares from a given start point. It does this by using the
+     * This method calulates the number of connected empty squares from a given start point. It does this by using the
      * floodFill algoritm as mentioned above but instead of changing the square types if just counts the number of empty squares
      * @param x start coordinate, from which to count connected 'nodes'
      * @param y start coordinate, from which to count connected 'nodes'
@@ -553,11 +554,11 @@ public class Board {
     }
 
     /**
-     * This function calculates and updates how much percentage of the playing field that is covered with done squares or blue
+     * This method calculates and updates how much percentage of the playing field that is covered with done squares or blue
      * squares.
      */
 
-    void setPercentage(){
+    public void setPercentage(){
         int totalBlocks = 0;
         double blocksDone = 0;
 	for(int i = 2; i < height - 2; ++i){
@@ -581,14 +582,14 @@ public class Board {
     	}
     }
 
-    void removeEnemy(final GameObject obj) {
-    	handler.removeObject(obj);
-    	score += DELETE_ENEMY_SCORE;
-    	if(obj.getId() == ID.BASIC_ENEMY){
+    public void removeEnemy(GameObject obj) {
+	score += DELETE_ENEMY_SCORE;
+	if(obj.getType() == Type.BASIC_ENEMY){
 	    nrBasicEnemies--;
-	}else if(obj.getId() == ID.DESTROY_ENEMY){
-    	    nrDestroyEnemies--;
+	}else if(obj.getType() == Type.DESTROY_ENEMY){
+	    nrDestroyEnemies--;
 	}
+	gameObjectHandler.removeObject(obj);
     }
 
     private void enterHighScore() {
@@ -619,8 +620,8 @@ public class Board {
             return this.squares[x][y];
         }
 
-    public ObjHandler getHandler() {
-    	return handler;
+    public GameObjectHandler getGameObjectHandler() {
+    	return gameObjectHandler;
         }
 
     public int getWidth() {
@@ -641,7 +642,7 @@ public class Board {
         return level;
     }
 
-    public static PacMan getPacMan() { return pacMan; }
+    public PacMan getPacMan() { return pacMan; }
 
     public int getScore() {
         return score;
