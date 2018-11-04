@@ -35,6 +35,8 @@ public class BasicEnemy extends Enemy
     }
 
     private boolean isSurrounded(int xEnemy, int yEnemy){
+        // Warning, overly complex boolean expression, this needs to be checked since we need to know if the
+	// enemy is surrounded
 	return xEnemy == 0 && board.getSquareType(xEnemy, yEnemy + 1) != SquareType.EMPTY &&
 		   board.getSquareType(xEnemy, yEnemy - 1) != SquareType.EMPTY ||
 		   yEnemy == 0 && board.getSquareType(xEnemy + 1, yEnemy) != SquareType.EMPTY &&

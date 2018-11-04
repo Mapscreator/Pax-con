@@ -20,7 +20,7 @@ public class SlowDownEnemies extends PowerUp
 
     private int timePassed = 0;
     private boolean runTimer = false;
-    private final static String SOUND_PATH = "C:\\Users\\Admin\\IdeaProjects\\Pax-con\\Sounds\\oh-yeah-everything-is-fine.wav";
+    private final static String SOUND_PATH = "../io/Sounds/oh-yeah-everything-is-fine.wav";
 
     public SlowDownEnemies(final int x, final int y, final int size, final Type type,
 			   final GameObjectHandler handler)
@@ -44,9 +44,9 @@ public class SlowDownEnemies extends PowerUp
     private void resetSpeeds() {
 
 	List<GameObject> objectList = getHandler().getObjects();
-	for (int i = 0; i < objectList.size(); ++i) {
-	    if (objectList.get(i).getType() == Type.BASIC_ENEMY || objectList.get(i).getType() == Type.DESTROY_ENEMY) {
-		changeSpeeds((Enemy) objectList.get(i), -SPEED_DIVIDER, -SPEED_DIVIDER);
+	for (GameObject anObjectList : objectList) {
+	    if (anObjectList.getType() == Type.BASIC_ENEMY || anObjectList.getType() == Type.DESTROY_ENEMY) {
+		changeSpeeds((Enemy) anObjectList, -SPEED_DIVIDER, -SPEED_DIVIDER);
 	    }
 	}
 
@@ -56,15 +56,15 @@ public class SlowDownEnemies extends PowerUp
     public void reactToPacManCollision()
     {
 	List<GameObject> objectList = getHandler().getObjects();
-	for (int i = 0; i < objectList.size(); ++i) {
-	    if (objectList.get(i).getType() == Type.BASIC_ENEMY || objectList.get(i).getType() == Type.DESTROY_ENEMY) {
-	        changeSpeeds((Enemy) objectList.get(i), SPEED_DIVIDER, SPEED_DIVIDER);
+	for (GameObject anObjectList : objectList) {
+	    if (anObjectList.getType() == Type.BASIC_ENEMY || anObjectList.getType() == Type.DESTROY_ENEMY) {
+		changeSpeeds((Enemy) anObjectList, SPEED_DIVIDER, SPEED_DIVIDER);
 
 		this.getHandler().removeObject(this);
 	    }
 	}
 	startTimer();
-	Sound.playMusic(SOUND_PATH);
+	Sound.playMusic(getClass().getResource(SOUND_PATH));
 	Game.getBoard().setNrPowerUps(Game.getBoard().getNrPowerUps() - 1);
     }
 

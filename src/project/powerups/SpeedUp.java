@@ -16,7 +16,7 @@ public class SpeedUp extends PowerUp
     private boolean runTimer = false;
     private int timePassed = 0;
     private final static int DURATION = 500;
-    private final static String SOUND_PATH = "C:\\Users\\Admin\\IdeaProjects\\Pax-con\\Sounds\\oh-my-god-1.wav";
+    private final static String SOUND_PATH = "../io/Sounds/oh-my-god-1.wav";
     private Board board = Game.getBoard();
 
     public SpeedUp(final int x, final int y, final int size, final Type type,
@@ -43,7 +43,8 @@ public class SpeedUp extends PowerUp
     public void reactToPacManCollision() {
 	board.getPacMan().changeSpeed(SPEED_INCREASE);
 	this.getHandler().removeObject(this);
-	Sound.playMusic(SOUND_PATH);
+
+	Sound.playMusic(getClass().getResource(SOUND_PATH));
 	Game.getBoard().changeNrOfPowerUps(-1);
 	startTimer();
     }

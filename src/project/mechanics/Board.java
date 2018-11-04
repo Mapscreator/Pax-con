@@ -51,8 +51,8 @@ public class Board {
     private int timePassed = 0;
     private final static int PAUSE_DELAY = 3000;
 
-    private static final String LOSE_ONE_LIFE_SOUND = "C:\\Users\\Admin\\IdeaProjects\\Pax-con\\Sounds\\no-4.wav",
-	    COMPLETE_LEVEL_SOUND = "C:\\Users\\Admin\\IdeaProjects\\Pax-con\\Sounds\\no-4.wav";
+    private static final String LOSE_ONE_LIFE_SOUND = "../io/Sounds/no-4.wav",
+	    COMPLETE_LEVEL_SOUND = "../io/Sounds/no-4.wav";
 
     private boolean gameOver = false;
 
@@ -142,7 +142,7 @@ public class Board {
 		spawnEnemies();
 		final int percentToCompleteLevel = 80;
 		if(percentageComplete >= percentToCompleteLevel){
-		    Sound.playMusic(COMPLETE_LEVEL_SOUND);
+		    Sound.playMusic(getClass().getResource(COMPLETE_LEVEL_SOUND));
 		    timePassed = 0;
 		    state = GameState.PAUSE_SCREEN;
 		}
@@ -573,7 +573,7 @@ public class Board {
     }
 
     public void loseOneLife(){
-    	Sound.playMusic(LOSE_ONE_LIFE_SOUND);
+    	Sound.playMusic(getClass().getResource(LOSE_ONE_LIFE_SOUND));
 
 	pacMan.changeLives(-1);
 	pacMan.resetPacMan();

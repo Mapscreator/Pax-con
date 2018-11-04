@@ -12,7 +12,9 @@ import project.mechanics.SquareType;
 
 import java.awt.*;
 import java.text.DecimalFormat;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.swing.*;
 
 import static java.awt.Color.BLUE;
@@ -71,9 +73,23 @@ public class GameComponent extends JComponent implements BoardListener
     private final static int SCORE_X = 100, SCORE_Y = 150, PERCENT_X = 250, PERCENT_Y = 150, LEVEL_X = 550, LEVEL_Y = 150,
 	    		     LIVES_LEFT_X = 100, LIVES_LEFT_Y = 200;
 
+    private Map<String, ImageIcon> imageIcons = null;
+
     GameComponent(Board board) {
         this.board = board;
         this.board.addBoardListener(this);
+        this.imageIcons = new HashMap<>();
+        imageIcons.put(START_SCREEN_IMG, new ImageIcon(getClass().getResource(START_SCREEN_IMG)));
+        imageIcons.put(LEVEL_LOCK_IMG, new ImageIcon(getClass().getResource(LEVEL_LOCK_IMG)));
+	imageIcons.put(LEVEL_BACKGROUND_IMG, new ImageIcon(getClass().getResource(LEVEL_BACKGROUND_IMG)));
+	imageIcons.put(BASIC_ENEMY_IMG, new ImageIcon(getClass().getResource(BASIC_ENEMY_IMG)));
+	imageIcons.put(DESTROY_ENEMY_IMG, new ImageIcon(getClass().getResource(DESTROY_ENEMY_IMG)));
+	imageIcons.put(SPEED_POWER_UP_IMG, new ImageIcon(getClass().getResource(SPEED_POWER_UP_IMG)));
+	imageIcons.put(SLOW_DOWN_POWER_UP, new ImageIcon(getClass().getResource(SLOW_DOWN_POWER_UP)));
+	imageIcons.put(BLUE_SQUARE, new ImageIcon(getClass().getResource(BLUE_SQUARE)));
+	imageIcons.put(EMPTY_SQUARE, new ImageIcon(getClass().getResource(EMPTY_SQUARE)));
+	imageIcons.put(TRAIL_SQUARE, new ImageIcon(getClass().getResource(TRAIL_SQUARE)));
+	imageIcons.put(RED_TRAIL_SQUARE, new ImageIcon(getClass().getResource(RED_TRAIL_SQUARE)));
     }
 
     public void boardChanged() { this.repaint(); }
@@ -118,7 +134,7 @@ public class GameComponent extends JComponent implements BoardListener
     }
 
     private void drawStartScreen(Graphics2D g){
-	ImageIcon img = new ImageIcon(START_SCREEN_IMG);
+	ImageIcon img = new ImageIcon(getClass().getResource(START_SCREEN_IMG));
 	Image startScreen = img.getImage();
 	g.drawImage(startScreen, 0, 0,
 		    board.getWidth() * Game.getBoard().getSquareSize(),
@@ -177,7 +193,7 @@ public class GameComponent extends JComponent implements BoardListener
             GameObject object = handler.getObjects().get(i);
             switch (object.getType()) {
                 case PACMAN:
-		    drawElement(((PacMan) object).getImg(), draw, object.getX(), object.getY(), object.getSize());
+		    drawPacMan(((PacMan) object).getImg(), draw, object.getX(), object.getY(), object.getSize());
                     break;
                 case BASIC_ENEMY:
 		    drawElement(BASIC_ENEMY_IMG, draw, object.getX(), object.getY(), object.getSize());
@@ -203,12 +219,20 @@ public class GameComponent extends JComponent implements BoardListener
     }
 
     private void drawElement(String fileName, Graphics draw, int x, int y, int size){
-	ImageIcon img = new ImageIcon(fileName);
-	Image imgSlow = img.getImage();
+	Image imgSlow = imageIcons.get(fileName).getImage();
 	draw.drawImage(imgSlow,
 		       x - Game.getBoard().getSquareSize(),
 		       y - Game.getBoard().getSquareSize(),
 		       size, size, null);
+    }
+
+    private void drawPacMan(String fileName, Graphics draw, int x, int y, int size){
+        ImageIcon icon = new ImageIcon(getClass().getResource(fileName));
+        Image img = icon.getImage();
+	draw.drawImage(img,
+		      x -  Game.getBoard().getSquareSize(),
+		      y -  Game.getBoard().getSquareSize(),
+		      size, size, null);
     }
 
     private void drawEndScreen(final Graphics2D draw) {
@@ -263,8 +287,7 @@ public class GameComponent extends JComponent implements BoardListener
     }
 
     private void drawSquare(String fileName, Graphics g2d, int x, int y) {
-	ImageIcon icon = new ImageIcon(fileName);
-	Image img = icon.getImage();
+	Image img = imageIcons.get(fileName).getImage();
 	g2d.drawImage(img,
 		      (x - 1) * Game.getBoard().getSquareSize(),
 		      (y - 1) * Game.getBoard().getSquareSize(),

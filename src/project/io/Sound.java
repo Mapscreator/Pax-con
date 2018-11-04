@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
@@ -19,11 +20,11 @@ public final class Sound {
 
     private Sound() {}
 
-    public static void playMusic(String filepath){
+    public static void playMusic(URL filepath){
 	Logger logger = Logger.getLogger(Sound.class.getName());
         try{
 
-	    InputStream music = new FileInputStream(new File(filepath));
+	    InputStream music = new FileInputStream(new File(filepath.toString().substring(5)));
 	    AudioStream audios = new AudioStream(music); // Warning, us of Sun-supplied class 'AudioStream' is not portable.
             AudioPlayer.player.start(audios);
 
