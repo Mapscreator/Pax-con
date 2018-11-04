@@ -56,9 +56,10 @@ public class SlowDownEnemies extends PowerUp
     public void reactToPacManCollision()
     {
 	List<GameObject> objectList = getHandler().getObjects();
-	for (GameObject anObjectList : objectList) {
-	    if (anObjectList.getType() == Type.BASIC_ENEMY || anObjectList.getType() == Type.DESTROY_ENEMY) {
-		changeSpeeds((Enemy) anObjectList, SPEED_DIVIDER, SPEED_DIVIDER);
+	for (int i = 0; i < objectList.size(); ++i) { // Warning. I do not want to change to foreach since an object can be
+	    // removed inside the loop
+	    if (objectList.get(i).getType() == Type.BASIC_ENEMY || objectList.get(i).getType() == Type.DESTROY_ENEMY) {
+		changeSpeeds((Enemy) objectList, SPEED_DIVIDER, SPEED_DIVIDER);
 
 		this.getHandler().removeObject(this);
 	    }
