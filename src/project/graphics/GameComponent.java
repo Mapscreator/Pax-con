@@ -31,7 +31,7 @@ public class GameComponent extends JComponent implements BoardListener
 
     private final static int BOARD_OFFSET = 2; // to not include the squares that's outside the game-zone.
 
-    private final static String START_SCREEN_IMG = "C:\\Users\\Admin\\IdeaProjects\\Pax-con\\img\\startScreen.png";
+    private final static String START_SCREEN_IMG = "img\\startScreen.png";
 
     /**
      * Variables used to draw the Level-select screen.
@@ -39,8 +39,8 @@ public class GameComponent extends JComponent implements BoardListener
     private final static int LEVEL_IMG_X = 140, LEVEL_IMG_Y = 300, LEVEL_IMG_SIZE = 60,
 	    		     SPACE_BETWEEN_LEVEL_IMG_X = 120, SPACE_BETWEEN_LEVEL_IMG_Y = 100,
 	    		     LEVEL_TEXT_X = 160, LEVEL_TEXT_Y = 350;
-    private final static String LEVEL_LOCK_IMG = "C:\\Users\\Admin\\IdeaProjects\\Pax-con\\img\\LevelLock.png";
-    private final static String LEVEL_BACKGROUND_IMG = "C:\\Users\\Admin\\IdeaProjects\\Pax-con\\img\\LevelBackgound.png";
+    private final static String LEVEL_LOCK_IMG = "img\\LevelLock.png";
+    private final static String LEVEL_BACKGROUND_IMG = "img\\LevelBackgound.png";
 
     /**
      * Variables used to draw the end game screen, including high score list.
@@ -52,18 +52,18 @@ public class GameComponent extends JComponent implements BoardListener
     /**
      * All the images used for the GameObject sprites.
      */
-    private final static String BASIC_ENEMY_IMG = "C:\\Users\\Admin\\IdeaProjects\\Pax-con\\img\\BASICENEMY.png",
-			        DESTROY_ENEMY_IMG = "C:\\Users\\Admin\\IdeaProjects\\Pax-con\\img\\LARGEENEMY.png",
-			        SPEED_POWER_UP_IMG = "C:\\Users\\Admin\\IdeaProjects\\Pax-con\\img\\speedPowerUp.png",
-			        SLOW_DOWN_POWER_UP = "C:\\Users\\Admin\\IdeaProjects\\Pax-con\\img\\SlowDownPowerUp.png";
+    private final static String BASIC_ENEMY_IMG = "img\\BASICENEMY.png",
+			        DESTROY_ENEMY_IMG = "img\\LARGEENEMY.png",
+			        SPEED_POWER_UP_IMG = "img\\speedPowerUp.png",
+			        SLOW_DOWN_POWER_UP = "img\\SlowDownPowerUp.png";
 
     /**
      * All the images used to draw the different squares on the board.
      */
-    private final static String BLUE_SQUARE = "C:\\Users\\Admin\\IdeaProjects\\Pax-con\\img\\PAXCONTILE.png",
-			        EMPTY_SQUARE = "C:\\Users\\Admin\\IdeaProjects\\Pax-con\\img\\PAXCONTILEE.png",
-			        TRAIL_SQUARE = "C:\\Users\\Admin\\IdeaProjects\\Pax-con\\img\\TRAIL.png",
-			        RED_TRAIL_SQUARE = "C:\\Users\\Admin\\IdeaProjects\\Pax-con\\img\\REDTRAIL.png";
+    private final static String BLUE_SQUARE = "img\\PAXCONTILE.png",
+			        EMPTY_SQUARE = "img\\PAXCONTILEE.png",
+			        TRAIL_SQUARE = "img\\TRAIL.png",
+			        RED_TRAIL_SQUARE = "img\\REDTRAIL.png";
 
     /**
      * Variables for the main game state. Includes score, percent complete, level and lives left coordinates.

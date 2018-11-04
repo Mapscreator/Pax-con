@@ -20,10 +20,10 @@ public class PacMan extends GameObject
     private final static int START_LIVES = 3;
     private int lives;
 
-    private final static String RIGHT_IMG = "C:\\Users\\Admin\\IdeaProjects\\Pax-con\\img\\right.png",
-				LEFT_IMG = "C:\\Users\\Admin\\IdeaProjects\\Pax-con\\img\\left.png",
-				UP_IMG = "C:\\Users\\Admin\\IdeaProjects\\Pax-con\\img\\up.png",
-				DOWN_IMG = "C:\\Users\\Admin\\IdeaProjects\\Pax-con\\img\\down.png";
+    private final static String RIGHT_IMG = "img\\right.png",
+				LEFT_IMG = "img\\left.png",
+				UP_IMG = "img\\up.png",
+				DOWN_IMG = "img\\down.png";
     private String img = RIGHT_IMG;
 
     public PacMan(int x, int y, int size, Type type, GameObjectHandler handler) {
